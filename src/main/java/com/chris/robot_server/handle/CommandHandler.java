@@ -1,0 +1,103 @@
+package com.chris.robot_server.handle;
+
+import org.springframework.stereotype.Component;
+
+import com.chris.robot_server.util.TelegramTextUtil;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.SendMessage;
+
+/**
+ * 处理命令消息（如 /menu、/help）
+ */
+@Component
+public class CommandHandler implements BaseHandler {
+
+        private final TelegramBot bot;
+
+        public CommandHandler(TelegramBot bot) {
+                this.bot = bot;
+        }
+
+        @Override
+        public boolean supports(Update update) {
+                return update.message() != null && update.message().text() != null
+                                && update.message().text().startsWith("/");
+        }
+
+        @Override
+        public void handle(Update update) {
+                Message msg = update.message();
+                long chatId = msg.chat().id();
+
+                String text = TelegramTextUtil.normalize(msg.text());
+                String cmd = TelegramTextUtil.extractCommand(text);
+
+                switch (cmd) {
+                        case "/menu":
+                                sendMenu(chatId);
+                                break;
+                        case "/setting":
+                                sendSetting(chatId);
+                                break;
+                        default:
+                                bot.execute(new SendMessage(chatId, "未知命令"));
+                }
+        }
+
+        private void sendSetting(long chatId) {
+                InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("新澳六合彩").callbackData("open-xin-aomen"),
+                                },
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("香港六合彩").callbackData("open-hongkong"),
+                                },
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("快乐8六合彩").callbackData("open-kl8"),
+                                });
+
+                bot.execute(new SendMessage(chatId, "请选择每日定时推送彩种：").replyMarkup(keyboard));
+        }
+
+        private void sendMenu(long chatId) {
+                // InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
+                // new InlineKeyboardButton("挑码助手").callbackData("tiaoma"),
+                // new InlineKeyboardButton("新澳六合彩开奖历史").callbackData("xin-aomen"),
+                // new InlineKeyboardButton("香港六合彩开奖历史").callbackData("hongkong"),
+                // new InlineKeyboardButton("快乐8六合彩开奖历史").callbackData("hongkong"));
+
+                InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("挑码助手").callbackData("tiaoma")
+                                },
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("新澳六合彩开奖历史").callbackData("xin-aomen"),
+                                },
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("香港六合彩开奖历史").callbackData("hongkong"),
+                                },
+                                new InlineKeyboardButton[] {
+                                                new InlineKeyboardButton("快乐8六合彩开奖历史").callbackData("kl8"),
+                                });
+
+                bot.execute(new SendMessage(chatId, "菜单：").replyMarkup(keyboard));
+                // SendResponse response = bot.execute(
+                //                 new SendMessage(chatId, "请选择每日定时推送彩种：")
+                //                                 .replyMarkup(keyboard));
+
+                // if (!response.isOk()) {
+                //         System.out.println("发送失败:");
+                //         System.out.println("errorCode = " + response.errorCode());
+                //         System.out.println("description = " + response.description());
+                // }
+        }
+
+        @Override
+        public int priority() {
+                return 10;
+        }
+}

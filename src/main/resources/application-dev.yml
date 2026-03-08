@@ -1,0 +1,98 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/robot_db?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: robot_db
+    password: qazokm0987
+    druid:
+      #连接池的设置
+      #初始化时建立物理连接的个数
+      initialSize: 5
+      #最小连接池数量
+      minIdle: 5
+      maxActive: 20
+      #获取连接时最大等待时间，单位毫秒
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      #用来检测连接是否有效的sql 必须是一个查询语句
+      validationQuery: SELECT 'x'
+      testWhileIdle: true
+      #申请连接时会执行validationQuery检测连接是否有效,开启会降低性能,默认为true
+      testOnBorrow: true
+      testOnReturn: false
+      #是否缓存preparedStatement
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      #配置扩展插件
+      filters: stat,wall
+      #通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    #      stat-view-servlet:
+    #        allow: 127.0.0.1
+    #        enabled: true
+    #        login-username: admin
+    #        login-password: admin
+    #      #合并多个DruidDataSource的监控数据
+    #      use-global-data-source-stat: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT-7
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  mvc:
+    servlet:
+      load-on-startup: 1
+
+mybatis:
+  type-aliases-package: com.chris.robot_server.model
+  mapper-locations: classpath:/mybatis-mappers/*
+  configuration:
+    mapUnderscoreToCamelCase: true
+
+#pagehelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  config: classpath:logback-admin.xml
+  level:
+    com.chris.robot_server.mapper: debug
+    org.springframework.web: INFO
+
+log:
+  level:
+    root: info
+    my: debug
+  file: logs/admin-server.log
+  maxsize: 30MB
+
+token:
+  expire:
+    seconds: 1296000 # 15天
+    # seconds: 8640000  100天改成30天
+  jwtSecret: (Match:)_$^11244^%$_(Chris:)_@@++--(Angela:)_++++_.sds_(Mia:)
+
+
+server:
+  port: 8080
+  address: 0.0.0.0
+  tomcat:
+    max-connections: 10000 #最大连接数
+    threads:
+      max: 3000 #最大线程数
+    accept-count: 10000 #容纳的最大用户数
+  servlet:
+    context-path: /
+
+
+telegram:
+  bot-token: 8507501119:AAEnlQPcEU1OKmGvpgtuBD3IyhfFTTPGw3c
+
+push:
+  daily-message: "📢 今日公告：欢迎使用民间机器人！"

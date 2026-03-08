@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "MatchLoverApplication",
+            "request": "launch",
+            "mainClass": "com.chris.robot_server.MatchLoverApplication",
+            "projectName": "match_lover"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MatchLoverApplication<robot_server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.chris.robot_server.MatchLoverApplication",
+            "projectName": "robot_server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
