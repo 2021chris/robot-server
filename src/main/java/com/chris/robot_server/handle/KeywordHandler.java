@@ -106,6 +106,12 @@ public class KeywordHandler implements BaseHandler {
                 });
 
         bot.execute(new SendMessage(chatId, "请选择每日定时推送彩种：").replyMarkup(keyboard));
+
+        bot.execute(new SendMessage(keyboard, "彩满天邀请码【661146】🙊\r\n" + //
+                        "万利下载地址1：168wl.app\r\n" + //
+                        "万利下载地址2：https://wanli.hzlqsg.com/\r\n" + //
+                        "畅玩网页版1: wanli68.com \r\n" + //
+                        "畅玩网页版2: wanli98.cc"));
     }
 
     @Override
