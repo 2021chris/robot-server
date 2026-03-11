@@ -40,28 +40,14 @@ public class CommandHandler implements BaseHandler {
                         case "/menu":
                                 sendMenu(chatId);
                                 break;
-                        case "/setting":
-                                sendSetting(chatId);
-                                break;
+                        // case "/setting":
+                        //         sendSetting(chatId);
+                        //         break;
                         default:
                                 bot.execute(new SendMessage(chatId, "未知命令"));
                 }
         }
 
-        private void sendSetting(long chatId) {
-                InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
-                                new InlineKeyboardButton[] {
-                                                new InlineKeyboardButton("新澳六合彩").callbackData("open-xin-aomen"),
-                                },
-                                new InlineKeyboardButton[] {
-                                                new InlineKeyboardButton("香港六合彩").callbackData("open-hongkong"),
-                                },
-                                new InlineKeyboardButton[] {
-                                                new InlineKeyboardButton("快乐8六合彩").callbackData("open-kl8"),
-                                });
-
-                bot.execute(new SendMessage(chatId, "请选择每日定时推送彩种：").replyMarkup(keyboard));
-        }
 
         private void sendMenu(long chatId) {
                 // InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(

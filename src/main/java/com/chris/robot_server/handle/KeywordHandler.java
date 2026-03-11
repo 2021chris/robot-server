@@ -40,21 +40,21 @@ public class KeywordHandler implements BaseHandler {
         String text = TelegramTextUtil.normalize(update.message().text());
         long chatId = update.message().chat().id();
 
-        if (text.contains("历史")||text.contains("开奖")) {
+        if("历史".equals(text) || "开奖".equals(text)) {
             sendMenu(chatId);
         }
-        if(text.contains("挑码")) {
+        if("挑码".equals(text) || "挑码助手".equals(text)) {
             String caption = getCaptionTelegramLinks("tm");
             bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
         }
-        if (text.contains("设置")) {
+        if ("设置彩种".equals(text)) {
             sendSetting(chatId);
         }
-        if (text.contains("生肖")) {
+        if ("生肖".equals(text)) {
             bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/s3.jpg").parseMode(ParseMode.HTML));
             bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/s4.jpg").parseMode(ParseMode.HTML));
         }
-        if (text.contains("复式")) {
+        if ("复式".equals(text)) {
             bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/fushi.jpg").parseMode(ParseMode.HTML));
         }
 
@@ -106,12 +106,6 @@ public class KeywordHandler implements BaseHandler {
                 });
 
         bot.execute(new SendMessage(chatId, "请选择每日定时推送彩种：").replyMarkup(keyboard));
-
-        bot.execute(new SendMessage(keyboard, "彩满天邀请码【661146】🙊\r\n" + //
-                        "万利下载地址1：168wl.app\r\n" + //
-                        "万利下载地址2：https://wanli.hzlqsg.com/\r\n" + //
-                        "畅玩网页版1: wanli68.com \r\n" + //
-                        "畅玩网页版2: wanli98.cc"));
     }
 
     @Override

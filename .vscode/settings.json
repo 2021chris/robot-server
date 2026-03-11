@@ -1,5 +1,17 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.debug.settings.onBuildFailureProceed": true
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.debug.settings.onBuildFailureProceed": true,
+
+  // 如果你用的是 cmd.exe（最常见的情况）
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": ["/K", "chcp 65001 >nul"]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "Command Prompt"
 }
