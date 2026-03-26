@@ -7,9 +7,12 @@ import com.chris.robot_server.vo.LotteryHistoryVO;
 public class LotteryMessageBuilder {
 
     public static String build(LotteryHistoryVO vo) {
+        return ReplyHeaderSimplebuild(vo.getExpect())
+                + LotteryMessagebuild(vo.getNumbers(), 7);
+    }
 
-
-        return ReplyHeaderbuild(vo.getExpect(),vo.getOpenTime(),vo.getLotteryType())
+    public static String buildDraw(LotteryHistoryVO vo) {
+        return ReplyHeaderbuild(vo.getExpect(),vo.getLotteryType())
                 + LotteryMessagebuild(vo.getNumbers(), 7);
     }
 
@@ -39,16 +42,24 @@ public class LotteryMessageBuilder {
                 + "";
     }
 
-    private static String ReplyHeaderbuild(String expect,String openTime,Byte lotteryType) {
-        // String ReplyHeader="";
-        // if(lotteryType==OpenStatusEnum.KL8.getCode()) {
-        //     ReplyHeader="快乐8六合彩开奖机器人\n";
-        // } else if(lotteryType==OpenStatusEnum.Hongkong.getCode()) {
-        //     ReplyHeader="香港六合彩开奖机器人\n";
-        // } else if(lotteryType==OpenStatusEnum.Xin_Aomen.getCode()) {
-        //     ReplyHeader="新澳六合彩开奖机器人\n";
-        // }
-        // ReplyHeader = ReplyHeader+"第"+expect+"期开奖结果:\n";
-        return "第"+expect+"期开奖结果:\n";
+    private static String ReplyHeaderSimplebuild(String expect) {
+        return "新澳实时开奖六合彩第"+expect+"期开奖结果:\n";
     }
+
+    private static String ReplyHeaderbuild(String expect,Byte lotteryType) {
+        String ReplyHeader="";
+        if(lotteryType==OpenStatusEnum.KL8.getCode()) {
+            ReplyHeader="快乐8六合彩";
+        } else if(lotteryType==OpenStatusEnum.Hongkong.getCode()) {
+            ReplyHeader="香港六合彩";
+        } else if(lotteryType==OpenStatusEnum.Xin_Aomen.getCode()) {
+            ReplyHeader="新澳门六合彩";
+        } else if(lotteryType==OpenStatusEnum.LaoAo.getCode()) {
+            ReplyHeader="老澳门六合彩";
+        }
+        ReplyHeader = ReplyHeader+"第"+expect+"期开奖结果:\n";
+        return ReplyHeader;
+    }
+
+    
 }

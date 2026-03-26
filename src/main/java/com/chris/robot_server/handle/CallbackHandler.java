@@ -85,6 +85,30 @@ public class CallbackHandler implements BaseHandler {
         }else if("open-kl8".equals(data)) {
             handleGroupStatus(chatId, OpenStatusEnum.KL8.getCode());
         }
+        else if("cpzctzw".equals(data)) {
+            bot.execute(new SendMessage(chatId, "民间担保已收押金 3000USDT🙊\r\n" + //
+                                "万利下载地址1：168wl.app\r\n" + //
+                                "万利下载地址2：https://wanli.hzlqsg.com/\r\n" + //
+                                "畅玩网页版1: wanli68.com \r\n" + //
+                                "畅玩网页版2: wanli98.cc\r\n" + //
+                                "认准唯一房间号 彩满天 【661146】").parseMode(ParseMode.HTML));
+        }else if("tggfxzwz".equals(data)) {
+            String caption = getCaptionTelegramLinks("tggfxzwz");
+            bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
+        }else if("dkhyzdh".equals(data)) {
+            String caption = getCaptionTelegramLinks("dkhyzdh");
+            bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
+        }
+        else if("aqsyzwb".equals(data)) {
+            String caption = getCaptionTelegramLinks("aqsyzwb");
+            bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
+        }else if("mjucdy".equals(data)) {
+            String caption = getCaptionTelegramLinks("mjucdy");
+            bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
+        }else if("jsscpqq".equals(data)) {
+            String caption = getCaptionTelegramLinks("jsscpqq");
+            bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
+        }
     }
 
     // 唯一允许 deprecated API 的地方（隔离）
@@ -259,10 +283,20 @@ public class CallbackHandler implements BaseHandler {
         return sb.toString();
     }
 
+
+    private String getKeydbConfig(String type) {
+        List<TelegramLink> telegramLinks = telegramLinkMapper.selectByType(type);
+        StringBuilder sb = new StringBuilder();
+        for (TelegramLink link : telegramLinks) {
+            sb.append(escape(link.getAddress()));
+        }
+        return sb.toString();
+    }
+
     private String getCaptionTelegramLinks(String type) {
         List<TelegramLink> telegramLinks = telegramLinkMapper.selectByType(type);
         StringBuilder sb = new StringBuilder();
-        sb.append("🎯 <b> 挑码助手</b>\n\n");
+        // sb.append("🎯 <b> 挑码助手</b>\n\n");
         for (TelegramLink link : telegramLinks) {
             sb.append("📌 <b>")
                     .append(escape(link.getTitle()))

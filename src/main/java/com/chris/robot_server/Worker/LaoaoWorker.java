@@ -1,21 +1,5 @@
 package com.chris.robot_server.Worker;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import com.chris.robot_server.component.HttpClient;
-
-import com.chris.robot_server.dao.LotteryHistoryMapper;
-import com.chris.robot_server.model.LotteryHistory;
-import com.chris.robot_server.model.TelegramGroup;
-import com.chris.robot_server.service.PushService;
-import com.chris.robot_server.util.DateUtil;
-import com.chris.robot_server.util.TelegramTextUtil;
-import com.chris.robot_server.vo.LotteryHistoryVO;
-import com.chris.robot_server.dao.TelegramGroupMapper;
-import com.chris.robot_server.enums.OpenStatusEnum;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,14 +8,28 @@ import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.chris.robot_server.component.HttpClient;
+import com.chris.robot_server.dao.LotteryHistoryLaoMapper;
+import com.chris.robot_server.dao.TelegramGroupMapper;
+import com.chris.robot_server.enums.OpenStatusEnum;
+import com.chris.robot_server.model.LotteryHistory;
+import com.chris.robot_server.model.LotteryHistoryLao;
+import com.chris.robot_server.model.TelegramGroup;
+import com.chris.robot_server.service.PushService;
+import com.chris.robot_server.util.DateUtil;
+import com.chris.robot_server.util.TelegramTextUtil;
+import com.chris.robot_server.vo.LotteryHistoryVO;
+
 @Component
-public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
+public class LaoaoWorker extends BaseLotteryWorker<LotteryHistory>{
 
     @Autowired
-    LotteryHistoryMapper mapper;
+    LotteryHistoryLaoMapper mapper;
     @Autowired
     TelegramGroupMapper groupMapper;
     @Autowired
@@ -39,12 +37,11 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
     @Autowired
     PushService pushService;
 
-    
     @Override
     protected void fetchAndProcess() {
         String body;
         try {
-            LotteryHistory last = mapper.selectLatest();
+            LotteryHistoryLao last = mapper.selectLatest();
 
             if (last != null) {
                 // 数据库中记录的开奖时间是今天，并且有7个开奖号码
@@ -64,7 +61,7 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
                 }
             }
 
-            body = http.get("https://macaumarksix.com/api/live2");
+            body = http.get("https://macaumarksix.com/api/live");
 
             if (body == null)
                 return;
@@ -88,13 +85,13 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
             if (last != null && last.getOpenCode().equals(openCode))
                 return;
 
-            LotteryHistory record = new LotteryHistory();
+            LotteryHistoryLao record = new LotteryHistoryLao();
             record.setExpect(expect);
             record.setOpenCode(openCode);
             record.setOpenTime(openTime);
             record.setZodiac(zodiac);
             record.setWave(wave);
-            record.setType("https://macaumarksix.com/api/live2");
+            record.setType("https://macaumarksix.com/api/live");
 
             Date newTime = DateUtil.ZonedBeijingNowDateTime();
             // 期号不同
@@ -124,13 +121,13 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
         }
     }
 
-    private void notifyGroups(LotteryHistory r) {
-        List<TelegramGroup> groups = groupMapper.findByStatus(OpenStatusEnum.Xin_Aomen.getCode());
+    private void notifyGroups(LotteryHistoryLao r) {
+        List<TelegramGroup> groups = groupMapper.findByStatus(OpenStatusEnum.LaoAo.getCode());
         int batchSize = 10;
         LotteryHistoryVO vo = new LotteryHistoryVO();
         vo.setExpect(r.getExpect());
         vo.setOpenTime(r.getOpenTime());
-        vo.setLotteryType(OpenStatusEnum.Xin_Aomen.getCode());
+        vo.setLotteryType(OpenStatusEnum.LaoAo.getCode());
         vo.setNumbers(TelegramTextUtil.convertStringToIntArray(r.getOpenCode()));
         for (int i = 0; i < groups.size(); i += batchSize) {
             int end = Math.min(i + batchSize, groups.size());
@@ -145,4 +142,5 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
         }
 
     }
+
 }

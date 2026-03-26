@@ -4,7 +4,8 @@ public enum OpenStatusEnum {
 
     Xin_Aomen((byte)1, "Xin_Aomen"),
     Hongkong((byte)2, "Hongkong"),
-    KL8((byte)3, "KL8");
+    KL8((byte)3, "KL8"),
+    LaoAo((byte)4, "LaoAo");
 
     private Byte code;
 

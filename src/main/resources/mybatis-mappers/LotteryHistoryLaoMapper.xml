@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chris.robot_server.dao.LotteryHistoryLaoMapper">
+  <resultMap id="BaseResultMap" type="com.chris.robot_server.model.LotteryHistoryLao">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="expect" jdbcType="VARCHAR" property="expect" />
+    <result column="open_code" jdbcType="VARCHAR" property="openCode" />
+    <result column="zodiac" jdbcType="VARCHAR" property="zodiac" />
+    <result column="wave" jdbcType="VARCHAR" property="wave" />
+    <result column="open_time" jdbcType="VARCHAR" property="openTime" />
+    <result column="file_id" jdbcType="VARCHAR" property="fileId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, create_time, update_time, type, expect, open_code, zodiac, wave, open_time, file_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_history_lao
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectByExpect" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_history_lao
+    where expect = #{expect,jdbcType=VARCHAR}
+  </select>
+  <select id="selectallList" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_history_lao
+    order by expect desc
+  </select>
+  <select id="selectLatestList" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_history_lao
+    order by expect desc
+    limit #{limit,jdbcType=INTEGER}
+  </select>
+  <select id="selectLatest" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_history_lao
+    order by expect desc
+    limit 1
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from lottery_history_lao
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.chris.robot_server.model.LotteryHistoryLao">
+    insert into lottery_history_lao (id, create_time, update_time, 
+      type, expect, open_code, 
+      zodiac, wave, open_time, 
+      file_id)
+    values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{type,jdbcType=VARCHAR}, #{expect,jdbcType=VARCHAR}, #{openCode,jdbcType=VARCHAR}, 
+      #{zodiac,jdbcType=VARCHAR}, #{wave,jdbcType=VARCHAR}, #{openTime,jdbcType=VARCHAR}, 
+      #{fileId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.chris.robot_server.model.LotteryHistoryLao">
+    insert into lottery_history_lao
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="expect != null">
+        expect,
+      </if>
+      <if test="openCode != null">
+        open_code,
+      </if>
+      <if test="zodiac != null">
+        zodiac,
+      </if>
+      <if test="wave != null">
+        wave,
+      </if>
+      <if test="openTime != null">
+        open_time,
+      </if>
+      <if test="fileId != null">
+        file_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="expect != null">
+        #{expect,jdbcType=VARCHAR},
+      </if>
+      <if test="openCode != null">
+        #{openCode,jdbcType=VARCHAR},
+      </if>
+      <if test="zodiac != null">
+        #{zodiac,jdbcType=VARCHAR},
+      </if>
+      <if test="wave != null">
+        #{wave,jdbcType=VARCHAR},
+      </if>
+      <if test="openTime != null">
+        #{openTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileId != null">
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.chris.robot_server.model.LotteryHistoryLao">
+    update lottery_history_lao
+    <set>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="expect != null">
+        expect = #{expect,jdbcType=VARCHAR},
+      </if>
+      <if test="openCode != null">
+        open_code = #{openCode,jdbcType=VARCHAR},
+      </if>
+      <if test="zodiac != null">
+        zodiac = #{zodiac,jdbcType=VARCHAR},
+      </if>
+      <if test="wave != null">
+        wave = #{wave,jdbcType=VARCHAR},
+      </if>
+      <if test="openTime != null">
+        open_time = #{openTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileId != null">
+        file_id = #{fileId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.chris.robot_server.model.LotteryHistoryLao">
+    update lottery_history_lao
+    set create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=VARCHAR},
+      expect = #{expect,jdbcType=VARCHAR},
+      open_code = #{openCode,jdbcType=VARCHAR},
+      zodiac = #{zodiac,jdbcType=VARCHAR},
+      wave = #{wave,jdbcType=VARCHAR},
+      open_time = #{openTime,jdbcType=VARCHAR},
+      file_id = #{fileId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -27,6 +27,9 @@
     SELECT * FROM telegram_group WHERE status = #{status}
   </select>
   
+  <select id="selectAllGroups" resultMap="BaseResultMap">
+    SELECT * FROM telegram_group
+  </select>
   <delete id="deleteByGroupId">
     DELETE FROM telegram_group WHERE group_id = #{groupId}
 </delete>
