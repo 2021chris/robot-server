@@ -12,13 +12,13 @@ public class TelegramGroup {
 
     private String title;
 
-    private String type;
+    private String type;// 官方定义的类型，可能是private、group、supergroup或channel
 
     private Date createTime;
 
     private Date updateTime;
 
-    private Byte status;
+    private Byte status;// 区分什么彩的群1新澳，2香港，3快乐
 
     private Integer lastMessageId;
 

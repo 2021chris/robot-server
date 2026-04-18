@@ -291,11 +291,11 @@ public class HistoryLaoController {
      * @param year
      * @return
      */
-    @GetMapping("/gethistoryByYear/{year}")
+    @GetMapping("/gethistoryLao")
     @Transactional
-    public ResultVO<Object> gethistoryByYear(@PathVariable("year") String year) {
+    public ResultVO<Object> gethistoryLao() {
         try {
-            String url = "https://history.macaumarksix.com/history/macaujc/y/" + year;
+            String url = "http://api.bjjfnet.com/data/opencode/2032";
             HttpResponse<String> response = Unirest.get(url).asString();
             
             if (response.getStatus() != 200) {
@@ -310,41 +310,25 @@ public class HistoryLaoController {
             }
 
             JSONArray dataArray = jsonObject.getJSONArray("data");
-            List<LotteryHistoryLao> historyList = new ArrayList<>();
 
-            for (int i = 0; i < dataArray.size(); i++) {
-                JSONObject item = dataArray.getJSONObject(i);
-                LotteryHistoryLao history = new LotteryHistoryLao();
-                // Map only specified fields: expect, openCode, zodiac, wave, openTime
-                history.setExpect(item.getString("expect"));
-                history.setOpenCode(item.getString("openCode"));
-                history.setZodiac(item.getString("zodiac"));
-                history.setWave(item.getString("wave"));
-                history.setOpenTime(item.getString("openTime"));
-                history.setType(url);
-                
-                Date newTime = DateUtil.ZonedBeijingNowDateTime();
-                history.setCreateTime(newTime);
-                history.setUpdateTime(newTime);
+            JSONObject item = dataArray.getJSONObject(0);
+            LotteryHistoryLao history = new LotteryHistoryLao();
+            // Map only specified fields: expect, openCode, zodiac, wave, openTime
+            history.setExpect(item.getString("issue"));
+            history.setOpenCode(item.getString("openCode"));
+            history.setOpenTime(item.getString("openTime"));
+            history.setType(url);
+            
+            Date newTime = DateUtil.ZonedBeijingNowDateTime();
+            history.setCreateTime(newTime);
+            history.setUpdateTime(newTime);
 
-                historyList.add(history);
-            }
 
-            // Sort by expect ascending (small to large)
-            historyList.sort(Comparator.comparing(LotteryHistoryLao::getExpect));
+            System.out.println("111111111Saving expect: " + history.getExpect() + ", openCode: " + history.getOpenCode());
 
-            // Save to database
-            int count = 0;
-            for (LotteryHistoryLao history : historyList) {
-                // Check if exists to avoid duplicates
-                LotteryHistoryLao existing = lotteryHistoryLaoMapper.selectByExpect(history.getExpect());
-                if (existing == null) {
-                    lotteryHistoryLaoMapper.insertSelective(history);
-                    count++;
-                }
-            }
+           
 
-            return ResultUtil.success("Successfully synced " + count + " records.");
+            return ResultUtil.success("Successfully synced " + 1 + " records.");
 
         } catch (Exception e) {
             e.printStackTrace();

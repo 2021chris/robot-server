@@ -56,8 +56,8 @@ public class ApiPollingScheduler {
         System.out.println("✅ Polling started at " + LocalDateTime.now());
     }
 
-    // 每天 21:36:00 停止任务
-    @Scheduled(cron = "0 36 21 * * ?", zone = "Asia/Shanghai")
+    // 每天 21:36:30 停止任务
+    @Scheduled(cron = "30 36 21 * * ?", zone = "Asia/Shanghai")
     public synchronized void stopPolling() {
         if (executor != null) {
             executor.shutdown();
@@ -69,7 +69,7 @@ public class ApiPollingScheduler {
     private void scheduleNext(ScheduledExecutorService executor, BaseLotteryWorker<?> worker) {
         if (executor == null || executor.isShutdown()) return;
         // worker.run();// 测试
-        int delay = ThreadLocalRandom.current().nextInt(4, 10);
+        int delay = ThreadLocalRandom.current().nextInt(4, 9);
         executor.schedule(() -> {
             try {
                 worker.run();
@@ -81,7 +81,7 @@ public class ApiPollingScheduler {
 
 
     // 21:36:15 执行一次
-    @Scheduled(cron = "15 36 21 * * ?", zone = "Asia/Shanghai")
+    @Scheduled(cron = "35 36 21 * * ?", zone = "Asia/Shanghai")
     public void runOnceAfterStop() {
         // 在这里写你要执行的逻辑
         // 新开奖全体推送

@@ -40,9 +40,6 @@ public class CommandHandler implements BaseHandler {
                         case "/menu":
                                 sendMenu(chatId);
                                 break;
-                        // case "/setting":
-                        //         sendSetting(chatId);
-                        //         break;
                         default:
                                 bot.execute(new SendMessage(chatId, "未知命令"));
                 }
@@ -50,12 +47,6 @@ public class CommandHandler implements BaseHandler {
 
 
         private void sendMenu(long chatId) {
-                // InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
-                // new InlineKeyboardButton("挑码助手").callbackData("tiaoma"),
-                // new InlineKeyboardButton("新澳六合彩开奖历史").callbackData("xin-aomen"),
-                // new InlineKeyboardButton("香港六合彩开奖历史").callbackData("hongkong"),
-                // new InlineKeyboardButton("快乐8六合彩开奖历史").callbackData("hongkong"));
-
                 InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
                                 new InlineKeyboardButton[] {
                                                 new InlineKeyboardButton("挑码助手").callbackData("tiaoma")
@@ -71,15 +62,6 @@ public class CommandHandler implements BaseHandler {
                                 });
 
                 bot.execute(new SendMessage(chatId, "菜单：").replyMarkup(keyboard));
-                // SendResponse response = bot.execute(
-                //                 new SendMessage(chatId, "请选择每日定时推送彩种：")
-                //                                 .replyMarkup(keyboard));
-
-                // if (!response.isOk()) {
-                //         System.out.println("发送失败:");
-                //         System.out.println("errorCode = " + response.errorCode());
-                //         System.out.println("description = " + response.description());
-                // }
         }
 
         @Override

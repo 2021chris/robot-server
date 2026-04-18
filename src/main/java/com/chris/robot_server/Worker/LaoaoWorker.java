@@ -2,6 +2,7 @@ package com.chris.robot_server.Worker;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -22,6 +23,7 @@ import com.chris.robot_server.model.LotteryHistoryLao;
 import com.chris.robot_server.model.TelegramGroup;
 import com.chris.robot_server.service.PushService;
 import com.chris.robot_server.util.DateUtil;
+import com.chris.robot_server.util.ResultUtil;
 import com.chris.robot_server.util.TelegramTextUtil;
 import com.chris.robot_server.vo.LotteryHistoryVO;
 
@@ -61,53 +63,38 @@ public class LaoaoWorker extends BaseLotteryWorker<LotteryHistory>{
                 }
             }
 
-            body = http.get("https://macaumarksix.com/api/live");
+            body = http.get("http://api.bjjfnet.com/data/opencode/2032");
 
-            if (body == null)
-                return;
+            if (body == null)return;
 
-            JSONArray jsonArray = JSON.parseArray(body);
-
-            if (jsonArray == null || jsonArray.isEmpty()) {
-                return;
+            JSONObject jsonObject = JSON.parseObject(body);
+            if (jsonObject == null || !jsonObject.containsKey("data")) {
+                 return;
             }
 
-            // 接口返回数组，取第一条
-            JSONObject item = jsonArray.getJSONObject(0);
+            JSONArray dataArray = jsonObject.getJSONArray("data");
+            JSONObject item = dataArray.getJSONObject(0);
 
-            String expect = item.getString("expect");
-            String openCode = item.getString("openCode");
-            String openTime = item.getString("openTime");
-            String zodiac = item.getString("zodiac");
-            String wave = item.getString("wave");
-
-            // 3. 若开奖号相同，则不推送（恢复你原始需求）
-            if (last != null && last.getOpenCode().equals(openCode))
+            String expect = item.getString("issue");
+            int expectNum = Integer.parseInt(expect);
+            int lastExpectNum = last != null ? Integer.parseInt(last.getExpect()) : -1;
+            if (expectNum <= lastExpectNum) {
+                // 已经处理过了
                 return;
+            }
+            LotteryHistoryLao history = new LotteryHistoryLao();
 
-            LotteryHistoryLao record = new LotteryHistoryLao();
-            record.setExpect(expect);
-            record.setOpenCode(openCode);
-            record.setOpenTime(openTime);
-            record.setZodiac(zodiac);
-            record.setWave(wave);
-            record.setType("https://macaumarksix.com/api/live");
-
+            history.setExpect(expect);
+            history.setOpenCode(item.getString("openCode"));
+            history.setOpenTime(item.getString("openTime"));
+            history.setType("http://api.bjjfnet.com/data/opencode/2032");
+            
             Date newTime = DateUtil.ZonedBeijingNowDateTime();
-            // 期号不同
-            if (last == null || !last.getExpect().equals(expect)) {
-                record.setCreateTime(newTime);
-                mapper.insert(record);
-            } else {
-                // 期号相同但开奖号码不同才能更新
-                if(openCode.equals(last.getOpenCode())) return;
-                last.setOpenCode(openCode);
-                last.setZodiac(zodiac);
-                last.setUpdateTime(newTime);
-                last.setWave(wave);
-                mapper.updateByPrimaryKeySelective(last);
-            }
-            notifyGroups(record);
+            history.setCreateTime(newTime);
+
+            mapper.insert(history);
+            
+            // notifyGroups(history);
             
         } catch (IOException e) {
             sleepRandom(5000, 9000);

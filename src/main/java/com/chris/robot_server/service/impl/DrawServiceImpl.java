@@ -61,32 +61,32 @@ public class DrawServiceImpl implements DrawService {
         }
 
         for (LotteryPushExpect pushExpect : allPushExpect) {
-            // 新澳
-            if ("xa".equals(pushExpect.getType())) {
-                LotteryHistory last = lotteryHistoryMapper.selectLatest();
-                if (!pushExpect.getExpect().equals(last.getExpect())) {
-                    // 预期的期号和数据库中最新的期号不一致，说明需要推送
-                    pushExpect.setExpect(last.getExpect());
-                    lotteryPushExpectMapper.updateByPrimaryKeySelective(pushExpect);
+            // 新澳不发
+            // if ("xa".equals(pushExpect.getType())) {
+            //     LotteryHistory last = lotteryHistoryMapper.selectLatest();
+            //     if (!pushExpect.getExpect().equals(last.getExpect())) {
+            //         // 预期的期号和数据库中最新的期号不一致，说明需要推送
+            //         pushExpect.setExpect(last.getExpect());
+            //         lotteryPushExpectMapper.updateByPrimaryKeySelective(pushExpect);
 
-                    // 推送到群
-                    LotteryHistoryVO vo = new LotteryHistoryVO();
-                    vo.setExpect(last.getExpect());
-                    vo.setOpenTime(last.getOpenTime());
-                    vo.setLotteryType(OpenStatusEnum.Xin_Aomen.getCode());
-                    vo.setNumbers(TelegramTextUtil.convertStringToIntArray(last.getOpenCode()));
-                    String text = LotteryMessageBuilder.buildDraw(vo);
+            //         // 推送到群
+            //         LotteryHistoryVO vo = new LotteryHistoryVO();
+            //         vo.setExpect(last.getExpect());
+            //         vo.setOpenTime(last.getOpenTime());
+            //         vo.setLotteryType(OpenStatusEnum.Xin_Aomen.getCode());
+            //         vo.setNumbers(TelegramTextUtil.convertStringToIntArray(last.getOpenCode()));
+            //         String text = LotteryMessageBuilder.buildDraw(vo);
 
-                    for (TelegramGroup group : groups) {
-                        bot.execute(new SendMessage(group.getGroupId(), text));
-                        try {
-                            Thread.sleep(1000); // 每批次后等待1秒，确保不超过30/sec
-                        } catch (InterruptedException e) {
-                            // 处理中断
-                        }
-                    }
-                }
-            }
+            //         for (TelegramGroup group : groups) {
+            //             bot.execute(new SendMessage(group.getGroupId(), text));
+            //             try {
+            //                 Thread.sleep(1000); // 每批次后等待1秒，确保不超过30/sec
+            //             } catch (InterruptedException e) {
+            //                 // 处理中断
+            //             }
+            //         }
+            //     }
+            // }
             // 老澳
             if ("lao".equals(pushExpect.getType())) {
                 LotteryHistoryLao last = lotteryHistoryLaoMapper.selectLatest();
