@@ -10,17 +10,15 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 处理命令消息（如 /menu、/help）
  */
 @Component
+@RequiredArgsConstructor
 public class CommandHandler implements BaseHandler {
 
-        private final TelegramBot bot;
-
-        public CommandHandler(TelegramBot bot) {
-                this.bot = bot;
-        }
 
         @Override
         public boolean supports(Update update) {
@@ -29,7 +27,7 @@ public class CommandHandler implements BaseHandler {
         }
 
         @Override
-        public void handle(Update update) {
+        public void handle(TelegramBot bot, String token, Update update) {
                 Message msg = update.message();
                 long chatId = msg.chat().id();
 
@@ -38,7 +36,7 @@ public class CommandHandler implements BaseHandler {
 
                 switch (cmd) {
                         case "/menu":
-                                sendMenu(chatId);
+                                sendMenu(bot, chatId);
                                 break;
                         default:
                                 bot.execute(new SendMessage(chatId, "未知命令"));
@@ -46,7 +44,7 @@ public class CommandHandler implements BaseHandler {
         }
 
 
-        private void sendMenu(long chatId) {
+        private void sendMenu(TelegramBot bot, long chatId) {
                 InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
                                 new InlineKeyboardButton[] {
                                                 new InlineKeyboardButton("挑码助手").callbackData("tiaoma")

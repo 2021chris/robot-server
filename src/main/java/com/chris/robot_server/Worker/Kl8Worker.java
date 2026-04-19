@@ -151,7 +151,7 @@ public class Kl8Worker extends BaseLotteryWorker<LotteryHistoryKl> {
                 pushService.pushToGroups(vo, g);
             }
             try {
-                Thread.sleep(1000); // 每批次后等待1秒，确保不超过30/sec
+                Thread.sleep(500); // 每批次后等待1秒，确保不超过30/sec
             } catch (InterruptedException e) {
                 // 处理中断
             }

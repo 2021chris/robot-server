@@ -65,11 +65,11 @@ public class ApiPollingScheduler {
         }
     }
 
-    // 每轮 4–8 秒随机调度
+    // 每轮 1-3 秒随机调度
     private void scheduleNext(ScheduledExecutorService executor, BaseLotteryWorker<?> worker) {
         if (executor == null || executor.isShutdown()) return;
         // worker.run();// 测试
-        int delay = ThreadLocalRandom.current().nextInt(4, 9);
+        int delay = ThreadLocalRandom.current().nextInt(1, 3);
         executor.schedule(() -> {
             try {
                 worker.run();

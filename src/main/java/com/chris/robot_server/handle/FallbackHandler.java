@@ -2,6 +2,7 @@ package com.chris.robot_server.handle;
 
 import org.springframework.stereotype.Component;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 
 /**
@@ -16,7 +17,7 @@ public class FallbackHandler implements BaseHandler {
     }
 
     @Override
-    public void handle(Update update) {
+    public void handle(TelegramBot bot, String token, Update update) {
         System.out.println("Unhandled update: " + update.updateId());
     }
 

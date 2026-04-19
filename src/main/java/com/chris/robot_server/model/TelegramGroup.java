@@ -22,10 +22,16 @@ public class TelegramGroup {
 
     private Integer lastMessageId;
 
-    public TelegramGroup(Long groupId, String title, String type) {
+    private Long botId;// 关联的机器人ID，方便后续查询和管理
+
+    private String token;// 机器人token，方便后续查询和管理
+
+    public TelegramGroup(Long groupId, String title, String type, Long botId, String token) {
         this.groupId = groupId;
         this.title = title;
         this.type = type;
+        this.botId = botId;
+        this.token = token;
     }
 
     public TelegramGroup() {

@@ -29,12 +29,14 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 处理回调查询（如按钮点击）
  */
 @Component
+@RequiredArgsConstructor
 public class CallbackHandler implements BaseHandler {
-    private final TelegramBot bot;
     private final LotteryHistoryMapper lotteryHistoryMapper;
     private final LotteryHistoryXgMapper lotteryHistoryXgMapper;
     private final LotteryHistoryKlMapper lotteryHistoryKlMapper;
@@ -42,26 +44,13 @@ public class CallbackHandler implements BaseHandler {
     private final TelegramLinkMapper telegramLinkMapper;
     private final TelegramGroupMapper telegramGroupMapper;
 
-    public CallbackHandler(TelegramBot bot, LotteryHistoryMapper lotteryHistoryMapper,
-            LotteryHistoryXgMapper lotteryHistoryXgMapper, LotteryHistoryKlMapper lotteryHistoryKlMapper,
-            ImageGeneratorService imageGeneratorService, TelegramLinkMapper telegramLinkMapper,
-            TelegramGroupMapper telegramGroupMapper) {
-        this.bot = bot;
-        this.lotteryHistoryMapper = lotteryHistoryMapper;
-        this.lotteryHistoryXgMapper = lotteryHistoryXgMapper;
-        this.lotteryHistoryKlMapper = lotteryHistoryKlMapper;
-        this.imageGeneratorService = imageGeneratorService;
-        this.telegramLinkMapper = telegramLinkMapper;
-        this.telegramGroupMapper = telegramGroupMapper;
-    }
-
     @Override
     public boolean supports(Update update) {
         return update.callbackQuery() != null;
     }
 
     @Override
-    public void handle(Update update) {
+    public void handle(TelegramBot bot, String token, Update update) {
         CallbackQuery query = update.callbackQuery();
         Long chatId = resolveChatId(query);
         if (chatId == null)
@@ -70,20 +59,20 @@ public class CallbackHandler implements BaseHandler {
         String data = query.data();
         if ("xin-aomen".equals(data)) {
             // bot.execute(new SendMessage(chatId, "当前价格：100 USDT"));
-            handleLotteryImage(chatId);
+            handleLotteryImage(bot,chatId);
         } else if ("hongkong".equals(data)) {
-            handleLotteryXgImage(chatId);
+            handleLotteryXgImage(bot,chatId);
         }else if("kl8".equals(data)) {
-            handleLotteryKlImage(chatId);
+            handleLotteryKlImage(bot,chatId);
         }else if ("tiaoma".equals(data)) {
             String caption = getCaptionTelegramLinks("tm");
             bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
         }else if("open-xin-aomen".equals(data)) {
-            handleGroupStatus(chatId, OpenStatusEnum.Xin_Aomen.getCode());
+            handleGroupStatus(bot,chatId, OpenStatusEnum.Xin_Aomen.getCode(), token);
         }else if("open-hongkong".equals(data)) {
-            handleGroupStatus(chatId, OpenStatusEnum.Hongkong.getCode());
+            handleGroupStatus(bot,chatId, OpenStatusEnum.Hongkong.getCode(), token);
         }else if("open-kl8".equals(data)) {
-            handleGroupStatus(chatId, OpenStatusEnum.KL8.getCode());
+            handleGroupStatus(bot,chatId, OpenStatusEnum.KL8.getCode(), token);
         }
         else if("cpzctzw".equals(data)) {
             bot.execute(new SendMessage(chatId, "民间担保已收押金 3000USDT🙊\r\n" + //
@@ -127,7 +116,7 @@ public class CallbackHandler implements BaseHandler {
         return 5;
     }
 
-    private void handleLotteryImage(Long chatId) {
+    private void handleLotteryImage(TelegramBot bot,Long chatId) {
         List<LotteryHistory> list = lotteryHistoryMapper.selectLatestList(15);
         if (CollectionUtils.isEmpty(list)) {
             bot.execute(new SendMessage(chatId, "暂无数据"));
@@ -144,7 +133,7 @@ public class CallbackHandler implements BaseHandler {
             try {
                 byte[] imageBytes = imageGeneratorService.generateLotteryImage(rows);
                 // 3️⃣ 上传图片 → 获取 file_id
-                String newFileId = sendAndGetFileId(chatId, imageBytes, "新澳门六合彩");
+                String newFileId = sendAndGetFileId(bot,chatId, imageBytes, "新澳门六合彩");
                 if (newFileId != null) {
                     // 4️⃣ 保存 file_id 到数据库
                     first.setFileId(newFileId);
@@ -157,7 +146,7 @@ public class CallbackHandler implements BaseHandler {
         // }
     }
 
-    private void handleLotteryKlImage(Long chatId) {
+    private void handleLotteryKlImage(TelegramBot bot, Long chatId) {
         List<LotteryHistoryKl> list = lotteryHistoryKlMapper.selectLatestList(15);
         if (CollectionUtils.isEmpty(list)) {
             bot.execute(new SendMessage(chatId, "暂无数据"));
@@ -166,7 +155,7 @@ public class CallbackHandler implements BaseHandler {
         LotteryHistoryKl first = list.get(0);
         String fileId = first.getFileId();
         if (fileId != null) {
-            sendByFileId(chatId, fileId, "快乐8六合彩");
+            sendByFileId(bot,chatId, fileId, "快乐8六合彩");
             return;
         }else {
             List<LotteryRow> rows = list.stream().map(item -> new LotteryRow(item.getExpect(), item.getOpenCode()))
@@ -174,7 +163,7 @@ public class CallbackHandler implements BaseHandler {
             try {
                 byte[] imageBytes = imageGeneratorService.generateLotteryImage(rows);
                 // 3️⃣ 上传图片 → 获取 file_id
-                String newFileId = sendAndGetFileId(chatId, imageBytes, "快乐8六合彩");
+                String newFileId = sendAndGetFileId(bot,chatId, imageBytes, "快乐8六合彩");
                 if (newFileId != null) {
                     // 4️⃣ 保存 file_id 到数据库
                     first.setFileId(newFileId);
@@ -187,7 +176,7 @@ public class CallbackHandler implements BaseHandler {
         }
     }
 
-    private void handleLotteryXgImage(Long chatId) {
+    private void handleLotteryXgImage(TelegramBot bot,Long chatId) {
         List<LotteryHistoryXg> list = lotteryHistoryXgMapper.selectLatestList(15);
         if (CollectionUtils.isEmpty(list)) {
             bot.execute(new SendMessage(chatId, "暂无数据"));
@@ -196,7 +185,7 @@ public class CallbackHandler implements BaseHandler {
         LotteryHistoryXg first = list.get(0);
         String fileId = first.getFileId();
         if (fileId != null) {
-            sendByFileId(chatId, fileId, "香港六合彩");
+            sendByFileId(bot,chatId, fileId, "香港六合彩");
             return;
         } else {
             List<LotteryRow> rows = list.stream().map(item -> new LotteryRow(item.getExpect(), item.getOpenCode()))
@@ -204,7 +193,7 @@ public class CallbackHandler implements BaseHandler {
             try {
                 byte[] imageBytes = imageGeneratorService.generateLotteryImage(rows);
                 // 3️⃣ 上传图片 → 获取 file_id
-                String newFileId = sendAndGetFileId(chatId, imageBytes, "香港六合彩");
+                String newFileId = sendAndGetFileId(bot,chatId, imageBytes, "香港六合彩");
                 if (newFileId != null) {
                     // 4️⃣ 保存 file_id 到数据库
                     first.setFileId(newFileId);
@@ -224,7 +213,7 @@ public class CallbackHandler implements BaseHandler {
      * @param imageBytes 图片字节数组
      * @return 图片文件ID（如果成功），否则为null
      */
-    private String sendAndGetFileId(Long chatId, byte[] imageBytes, String title) {
+    private String sendAndGetFileId(TelegramBot bot,Long chatId, byte[] imageBytes, String title) {
 
         String caption = getCaptionTelegramLinks("kj", title);
 
@@ -254,7 +243,7 @@ public class CallbackHandler implements BaseHandler {
      * @param chatId 聊天ID
      * @param fileId 图片文件ID
      */
-    private void sendByFileId(Long chatId, String fileId, String title) {
+    private void sendByFileId(TelegramBot bot,Long chatId, String fileId, String title) {
 
         String caption = getCaptionTelegramLinks("kj", title);
 
@@ -321,9 +310,10 @@ public class CallbackHandler implements BaseHandler {
      *
      * @param chatId 群ID
      * @param status 状态码
+     * @param token 令牌
      */
-    private void handleGroupStatus(Long chatId, Byte status) {
-        int res = telegramGroupMapper.updateStatusByGroupId(chatId, status);
+    private void handleGroupStatus(TelegramBot bot,Long chatId, Byte status, String token) {
+        int res = telegramGroupMapper.updateStatusByGroupIdAndToken(chatId, token, status);
         if (res > 0) {
             bot.execute(new SendMessage(chatId, "已更换定时推送"));
         }

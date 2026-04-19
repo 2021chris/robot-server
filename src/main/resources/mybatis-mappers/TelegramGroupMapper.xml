@@ -10,9 +10,11 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="last_message_id" jdbcType="INTEGER" property="lastMessageId" />
+    <result column="token" jdbcType="VARCHAR" property="token" />
+    <result column="bot_id" jdbcType="BIGINT" property="botId" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, group_id, title, type, create_time, update_time, status, last_message_id
+    id, group_id, title, type, create_time, update_time, status, last_message_id, token, bot_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -20,8 +22,8 @@
     from telegram_group
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <select id="existsByGroupId" resultType="boolean">
-    SELECT COUNT(1) > 0 FROM telegram_group WHERE group_id = #{groupId}
+  <select id="existsByGroupIdAndToken" parameterType="map" resultType="boolean">
+    SELECT COUNT(1) > 0 FROM telegram_group WHERE group_id = #{groupId} AND token = #{token}
   </select>
   <select id="findByStatus" resultMap="BaseResultMap">
     SELECT * FROM telegram_group WHERE status = #{status}
@@ -30,9 +32,9 @@
   <select id="selectAllGroups" resultMap="BaseResultMap">
     SELECT * FROM telegram_group
   </select>
-  <delete id="deleteByGroupId">
-    DELETE FROM telegram_group WHERE group_id = #{groupId}
-</delete>
+  <delete id="deleteByGroupIdAndToken" parameterType="map">
+    DELETE FROM telegram_group WHERE group_id = #{groupId} AND token = #{token}
+  </delete>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from telegram_group
@@ -40,10 +42,10 @@
   </delete>
   <insert id="insert" parameterType="com.chris.robot_server.model.TelegramGroup">
     insert into telegram_group (id, group_id, title, 
-      type, create_time, update_time
+      type, create_time, update_time, token
       )
     values (#{id,jdbcType=BIGINT}, #{groupId,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, 
-      #{type,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      #{type,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{token,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.chris.robot_server.model.TelegramGroup">
@@ -70,6 +72,12 @@
       <if test="status != null">
         status,
       </if>
+      <if test="token != null">
+        token,
+      </if>
+      <if test="botId != null">
+        bot_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -93,12 +101,18 @@
       <if test="status != null">
         status = #{status,jdbcType=TINYINT},
       </if>
+      <if test="token != null">
+        #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="botId != null">
+        #{botId,jdbcType=BIGINT},
+      </if>
     </trim>
   </insert>
-  <update id="updateStatusByGroupId" parameterType="map">
+  <update id="updateStatusByGroupIdAndToken" parameterType="map">
     update telegram_group
     set status = #{status,jdbcType=TINYINT}
-    where group_id = #{groupId,jdbcType=BIGINT}
+    where group_id = #{groupId,jdbcType=BIGINT} AND token = #{token,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.chris.robot_server.model.TelegramGroup">
     update telegram_group
@@ -124,6 +138,12 @@
       <if test="lastMessageId != null">
         last_message_id = #{lastMessageId,jdbcType=INTEGER},
       </if>
+      <if test="token != null">
+        token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="botId != null">
+        bot_id = #{botId,jdbcType=BIGINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -134,7 +154,9 @@
       type = #{type,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=TINYINT}
+      status = #{status,jdbcType=TINYINT},
+      token = #{token,jdbcType=VARCHAR},
+      bot_id = #{botId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

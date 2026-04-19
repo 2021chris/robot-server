@@ -13,19 +13,21 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PushServiceImpl implements PushService {
 
-    private final TelegramBot bot;
-
-    public PushServiceImpl(TelegramBot bot) {
-        this.bot = bot;
-    }
+    private final Map<String, TelegramBot> botMap; // token → TelegramBot
 
     @Override
-    public void send(long groupId, String text) {
+    public void send(long groupId, String text, String token) {
         try {
-            bot.execute(new SendMessage(groupId, text));
+            TelegramBot bot = botMap.get(token);
+            if (bot != null) {
+                bot.execute(new SendMessage(groupId, text));
+            }
             Thread.sleep(1200);
         } catch (Exception ignored) {}
     }
@@ -36,14 +38,20 @@ public class PushServiceImpl implements PushService {
     public void pushToGroups(LotteryHistoryVO vo,TelegramGroup group) {
         String text = LotteryMessageBuilder.build(vo);
         Integer msgId = lastMessageMap.get(group.getGroupId());
-
+        String token = group.getToken();
         if (msgId == null) {
-            var resp = bot.execute(new SendMessage(group.getGroupId(), text));
-            if (resp.isOk()) {
-                lastMessageMap.put(group.getGroupId(), resp.message().messageId());
+            TelegramBot bot = botMap.get(token);
+            if (bot != null) {
+                var resp = bot.execute(new SendMessage(group.getGroupId(), text));
+                if (resp.isOk()) {
+                    lastMessageMap.put(group.getGroupId(), resp.message().messageId());
+                }
             }
         } else {
-            bot.execute(new EditMessageText(group.getGroupId(), msgId, text));
+            TelegramBot bot = botMap.get(token);
+            if (bot != null) {
+                bot.execute(new EditMessageText(group.getGroupId(), msgId, text));
+            }
             if(vo.getNumbers().size()>=7) {
                 lastMessageMap.remove(group.getGroupId());
             }

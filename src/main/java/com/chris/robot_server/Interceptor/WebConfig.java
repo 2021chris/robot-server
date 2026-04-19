@@ -31,7 +31,7 @@ public class WebConfig  implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 // .allowedOrigins("http://127.0.0.1:3000") // 替换为你的前端域名
-                .allowedOriginPatterns("http://127.0.0.1:*", "http://localhost:*", "http://154.209.5.125:*", "http://palshort.net:*", "https://palshort.net:*", "null")
+                .allowedOriginPatterns("http://127.0.0.1:*", "http://localhost:*", "http://154.209.5.125:*", "http://palshort.net:*", "https://palshort.net:*", "https://tiaoma.palshort.com:*","null")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

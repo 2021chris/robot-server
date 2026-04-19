@@ -1,33 +1,41 @@
 package com.chris.robot_server.handle;
 
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.chris.robot_server.dao.TelegramGroupMapper;
 import com.chris.robot_server.model.TelegramGroup;
 import com.pengrad.telegrambot.model.Update;
+
+import lombok.RequiredArgsConstructor;
+
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.ChatMember;
+import com.pengrad.telegrambot.model.ChatMember.Status;
+import com.pengrad.telegrambot.model.ChatMemberUpdated;
 
 /**
  * 处理群聊加入事件
  */
 @Component
+@RequiredArgsConstructor
 public class GroupJoinHandler implements BaseHandler {
 
-    @Autowired
-    private TelegramGroupMapper telegramGroupMapper;
+    private final TelegramGroupMapper telegramGroupMapper;
 
 
     @Override
-    public void handle(Update u) {
+    public void handle(TelegramBot bot, String token, Update update) {
 
         System.out.println("GroupJoinHandler HANDLE triggered");
 
-        var m = u.myChatMember();
-        var chat = m.chat();
+        ChatMemberUpdated myChat = update.myChatMember();
+        Chat chat = myChat.chat();
 
-        var oldStatus = m.oldChatMember().status();
-        var newStatus = m.newChatMember().status();
+        Status oldStatus = myChat.oldChatMember().status();
+        Status newStatus = myChat.newChatMember().status();
 
         System.out.println("BOT STATUS CHANGE: " + oldStatus + " -> " + newStatus);
 
@@ -43,32 +51,35 @@ public class GroupJoinHandler implements BaseHandler {
         String title = chat.title();
         String type = chat.type().toString();
 
+        Long currentBotId = myChat.newChatMember().user().id();
+
         if (joined) {
             System.out.println("JOIN DETECTED: " + title);
-            saveGroup(groupId, title, type);
+            saveGroup(groupId, title, type, currentBotId, token);
         }
 
         if (left) {
             System.out.println("BOT REMOVED: " + title);
-            deleteGroup(groupId);
+            deleteGroup(groupId, token);
         }
     }
 
-    private void saveGroup(Long groupId, String title, String type) {
-        if (!telegramGroupMapper.existsByGroupId(groupId)) {
-            telegramGroupMapper.insert(new TelegramGroup(groupId, title, type));
+    private void saveGroup(Long groupId, String title, String type, Long botId, String token) {
+        if (!telegramGroupMapper.existsByGroupIdAndToken(groupId, token)) {
+            telegramGroupMapper.insert(new TelegramGroup(groupId, title, type, botId, token));
             System.out.println("DB INSERT OK: " + groupId);
         } else {
             TelegramGroup uGroup = new TelegramGroup();
             uGroup.setGroupId(groupId);
             uGroup.setTitle(title);
+            uGroup.setToken(token);
             telegramGroupMapper.updateByPrimaryKeySelective(uGroup);
             System.out.println("DB UPDATE OK: " + groupId);
         }
     }
 
-    private void deleteGroup(Long groupId) {
-        telegramGroupMapper.deleteByGroupId(groupId);
+    private void deleteGroup(Long groupId, String token) {
+        telegramGroupMapper.deleteByGroupIdAndToken(groupId, token);
         System.out.println("DB DELETE OK: " + groupId);
     }
 

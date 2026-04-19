@@ -17,7 +17,7 @@ public interface TelegramGroupMapper {
     @Select("SELECT COUNT(*) FROM telegram_group")
     int count();
 
-    void deleteByGroupId(@Param("groupId") Long groupId);
+    void deleteByGroupIdAndToken(@Param("groupId") Long groupId, @Param("token") String token);
 
     int deleteByPrimaryKey(Long id);
 
@@ -31,9 +31,9 @@ public interface TelegramGroupMapper {
 
     int updateByPrimaryKey(TelegramGroup record);
 
-    boolean existsByGroupId(@Param("groupId") Long groupId);
+    boolean existsByGroupIdAndToken(@Param("groupId") Long groupId, @Param("token") String token);
 
-    int updateStatusByGroupId(@Param("groupId") Long groupId, @Param("status") Byte status);
+    int updateStatusByGroupIdAndToken(@Param("groupId") Long groupId, @Param("token") String token, @Param("status") Byte status);
 
     List<TelegramGroup> findByStatus(Byte status);
 

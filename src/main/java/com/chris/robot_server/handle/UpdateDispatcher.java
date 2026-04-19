@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 分发Update到不同的Handler处理
@@ -16,28 +19,19 @@ import com.pengrad.telegrambot.model.Update;
  * join/leave 成员变动
  */
 @Component
+@RequiredArgsConstructor
 public class UpdateDispatcher {
     private final List<BaseHandler> handlers;
 
-    public UpdateDispatcher(List<BaseHandler> handlers) {
-        this.handlers = handlers.stream()
-                .sorted(Comparator.comparingInt(BaseHandler::priority).reversed())
-                .toList();
-    }
 
-    public void dispatch(Update update) {
-        for (BaseHandler h : handlers.stream()
+    // 你原来的业务服务、命令处理器等全部注入这里
+    public void handle(TelegramBot bot, String token, Update update) {
+        // 按 order 排序（优先级高的先执行）
+        handlers.stream()
                 .sorted(Comparator.comparingInt(BaseHandler::priority))
-                .toList()) {
-
-            if (h.supports(update)) {
-                System.out.println("Dispatching to: " + h.getClass().getSimpleName());
-                h.handle(update);
-                return;
-            }
-        }
-
-        System.out.println("Unhandled update: " + update.updateId());
+                .filter(h -> h.supports(update))
+                .findFirst()                     // 只执行第一个匹配的（责任链）
+                .ifPresent(h -> h.handle(bot, token, update));
     }
 
 }

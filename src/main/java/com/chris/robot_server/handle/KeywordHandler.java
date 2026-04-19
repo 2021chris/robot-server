@@ -10,8 +10,11 @@ import org.springframework.web.util.HtmlUtils;
 
 import com.chris.robot_server.dao.LotteryHistoryMapper;
 import com.chris.robot_server.dao.TelegramLinkMapper;
+import com.chris.robot_server.enums.KeywordTypeEnum;
+import com.chris.robot_server.model.BotKeyword;
 import com.chris.robot_server.model.LotteryHistory;
 import com.chris.robot_server.model.TelegramLink;
+import com.chris.robot_server.service.BotKeywordService;
 import com.chris.robot_server.service.ImageGeneratorService;
 import com.chris.robot_server.util.TelegramTextUtil;
 import com.chris.robot_server.vo.LotteryRow;
@@ -25,24 +28,20 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 处理关键词回复
  */
 @Component
+@RequiredArgsConstructor
 public class KeywordHandler implements BaseHandler {
 
-    private final TelegramBot bot;
     private final TelegramLinkMapper telegramLinkMapper;
     private final ImageGeneratorService imageGeneratorService;
     private final LotteryHistoryMapper lotteryHistoryMapper;
+    private final BotKeywordService botKeywordService;
 
-    public KeywordHandler(TelegramBot bot, TelegramLinkMapper telegramLinkMapper,
-            ImageGeneratorService imageGeneratorService, LotteryHistoryMapper lotteryHistoryMapper) {
-        this.bot = bot;
-        this.telegramLinkMapper = telegramLinkMapper;
-        this.imageGeneratorService = imageGeneratorService;
-        this.lotteryHistoryMapper = lotteryHistoryMapper;
-    }
 
     @Override
     public boolean supports(Update update) {
@@ -50,57 +49,37 @@ public class KeywordHandler implements BaseHandler {
     }
 
     @Override
-    public void handle(Update update) {
+    public void handle(TelegramBot bot, String token, Update update) {
         String text = TelegramTextUtil.normalize(update.message().text());
         long chatId = update.message().chat().id();
 
         if ("历史".equals(text) || "开奖".equals(text) || "k".equals(text)) {
-            handleLotteryImage(chatId);
+            handleLotteryImage(bot, chatId);
         }
         if ("挑码".equals(text) || "挑码助手".equals(text) || "t".equals(text) || "挑".equals(text)) {
             String caption = getCaptionTelegramLinks("tm");
             bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
         }
         if ("设置彩种".equals(text)) {
-            sendSetting(chatId);
+            sendSetting(bot, chatId);
         }
-        if ("生肖".equals(text) || "波色".equals(text) || "s".equals(text)) {
-            bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/s3.jpg").parseMode(ParseMode.HTML));
-            bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/s4.jpg").parseMode(ParseMode.HTML));
-        }
-        if ("复式".equals(text) || "组合".equals(text) || "f".equals(text)) {
-            bot.execute(new SendMessage(chatId, "https://img.xn--6-yq0c.com/fushi.jpg").parseMode(ParseMode.HTML));
-        }
-        if ("导航".equals(text) || "d".equals(text)) {
-            sendMenu(chatId);
-        }
+        // 非菜单关键词
+        List<BotKeyword> keywords = botKeywordService.getAllEnabledKeywords();
 
+        for (BotKeyword kw : keywords) {
+            if (kw.getKeyWord() != null && kw.getKeyWord().toLowerCase().equals(text)) {
+                if (kw.getType() == KeywordTypeEnum.Html.getCode()) {
+                    bot.execute(new SendMessage(chatId, kw.getKeyValue()).parseMode(ParseMode.HTML));
+                } else if (kw.getType() == KeywordTypeEnum.WordLink.getCode()) {
+                    bot.execute(new SendMessage(chatId, kw.getKeyValue()));
+                }
+                return;// 匹配到第一个就回复
+            }
+
+        }
     }
 
-    private void sendMenu(long chatId) {
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("彩票注册投注网").callbackData("cpzctzw")
-                },
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("TG官方下载网址").callbackData("tggfxzwz"),
-                },
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("代开会员直登号").callbackData("dkhyzdh"),
-                },
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("民间USDT承兑员").callbackData("mjucdy"),
-                },
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("安全使用中文包").callbackData("aqsyzwb"),
-                },
-                new InlineKeyboardButton[] {
-                        new InlineKeyboardButton("极速赛车计划群").callbackData("jsscpqq"),
-                });
-
-        bot.execute(new SendMessage(chatId, "导航：").replyMarkup(keyboard));
-    }
-
+   
     private String getCaptionTelegramLinks(String type) {
         List<TelegramLink> telegramLinks = telegramLinkMapper.selectByType(type);
         StringBuilder sb = new StringBuilder();
@@ -123,7 +102,7 @@ public class KeywordHandler implements BaseHandler {
         return HtmlUtils.htmlEscape(text);
     }
 
-    private void handleLotteryImage(Long chatId) {
+    private void handleLotteryImage(TelegramBot bot, Long chatId) {
         List<LotteryHistory> list = lotteryHistoryMapper.selectLatestList(15);
         if (CollectionUtils.isEmpty(list)) {
             bot.execute(new SendMessage(chatId, "暂无数据"));
@@ -140,7 +119,7 @@ public class KeywordHandler implements BaseHandler {
         try {
             byte[] imageBytes = imageGeneratorService.generateLotteryImage(rows);
             // 3️⃣ 上传图片 → 获取 file_id
-            String newFileId = sendAndGetFileId(chatId, imageBytes, "新澳门六合彩");
+            String newFileId = sendAndGetFileId(bot, chatId, imageBytes, "新澳门六合彩");
             if (newFileId != null) {
                 // 4️⃣ 保存 file_id 到数据库
                 first.setFileId(newFileId);
@@ -160,7 +139,7 @@ public class KeywordHandler implements BaseHandler {
      * @param imageBytes 图片字节数组
      * @return 图片文件ID（如果成功），否则为null
      */
-    private String sendAndGetFileId(Long chatId, byte[] imageBytes, String title) {
+    private String sendAndGetFileId(TelegramBot bot, Long chatId, byte[] imageBytes, String title) {
 
         String caption = getCaptionTelegramLinks("kj", title);
 
@@ -202,7 +181,7 @@ public class KeywordHandler implements BaseHandler {
         return sb.toString();
     }
 
-    private void sendSetting(long chatId) {
+    private void sendSetting(TelegramBot bot, long chatId) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
                 new InlineKeyboardButton[] {
                         new InlineKeyboardButton("新澳六合彩").callbackData("open-xin-aomen"),
