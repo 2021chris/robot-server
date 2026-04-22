@@ -66,7 +66,7 @@ public class GroupJoinHandler implements BaseHandler {
 
     private void saveGroup(Long groupId, String title, String type, Long botId, String token) {
         if (!telegramGroupMapper.existsByGroupIdAndToken(groupId, token)) {
-            telegramGroupMapper.insert(new TelegramGroup(groupId, title, type, botId, token));
+            telegramGroupMapper.insert(new TelegramGroup(groupId, title, type, botId, token, "1_0_0_0|0"));
             System.out.println("DB INSERT OK: " + groupId);
         } else {
             TelegramGroup uGroup = new TelegramGroup();

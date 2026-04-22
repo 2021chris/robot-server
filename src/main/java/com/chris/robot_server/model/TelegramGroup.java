@@ -26,12 +26,15 @@ public class TelegramGroup {
 
     private String token;// 机器人token，方便后续查询和管理
 
-    public TelegramGroup(Long groupId, String title, String type, Long botId, String token) {
+    private String settings; // 开奖设置
+
+    public TelegramGroup(Long groupId, String title, String type, Long botId, String token, String settings) {
         this.groupId = groupId;
         this.title = title;
         this.type = type;
         this.botId = botId;
         this.token = token;
+        this.settings = settings;
     }
 
     public TelegramGroup() {

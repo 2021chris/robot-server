@@ -3,6 +3,9 @@ package com.chris.robot_server.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.User;
+
 public class TelegramTextUtil {
     public static String normalize(String text) {
         return text.replace("\uFEFF", "").replace("\u200B", "").trim();
@@ -68,5 +71,40 @@ public class TelegramTextUtil {
         }
 
         return numbers;
+    }
+
+
+
+    // 从 Update 中提取用户 ID
+    public static Long getUserId(Update update) {
+        if (update.message() != null && update.message().from() != null) {
+            return update.message().from().id();
+        }
+        if (update.message() != null && update.message().newChatMembers() != null) {
+            for (User u : update.message().newChatMembers()) {
+                if (!u.isBot()) return u.id();
+            }
+        }
+        return null;
+    }
+
+    // 获取聊天ID（群ID或私聊ID）
+    public static Long getChatId(Update update) {
+        if (update.message() != null && update.message().chat() != null) {
+            return update.message().chat().id();
+        }
+        if (update.myChatMember() != null && update.myChatMember().chat() != null) {
+            return update.myChatMember().chat().id();
+        }
+        return null;
+    }
+
+    // 从 Update 中提取 User 对象
+    public static User extractUser(Update update) {
+        if (update.message() != null && update.message().from() != null) {
+            return update.message().from();
+        }
+        // newChatMembers 情况可类似处理
+        return null;
     }
 }

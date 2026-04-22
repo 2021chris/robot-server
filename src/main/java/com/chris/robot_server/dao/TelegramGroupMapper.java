@@ -35,6 +35,8 @@ public interface TelegramGroupMapper {
 
     int updateStatusByGroupIdAndToken(@Param("groupId") Long groupId, @Param("token") String token, @Param("status") Byte status);
 
+    TelegramGroup findByGroupIdAndToken(@Param("groupId") Long groupId, @Param("token") String token);
+
     List<TelegramGroup> findByStatus(Byte status);
 
     List<TelegramGroup> selectAllGroups();

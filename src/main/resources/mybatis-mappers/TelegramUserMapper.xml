@@ -5,14 +5,15 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="user_group" jdbcType="VARCHAR" property="userGroup" />
     <result column="user_group_id" jdbcType="BIGINT" property="userGroupId" />
     <result column="token" jdbcType="VARCHAR" property="token" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, create_time, update_time, user_id, user_name, user_group, user_group_id, token
+    id, create_time, update_time, user_id, user_name, user_group, user_group_id, token, display_name
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -27,10 +28,10 @@
   <insert id="insert" parameterType="com.chris.robot_server.model.TelegramUser">
     insert into telegram_user (id, create_time, update_time, 
       user_id, user_name, user_group, 
-      user_group_id, token)
+      user_group_id, token, display_name)
     values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{userId,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{userGroup,jdbcType=VARCHAR}, 
-      #{userGroupId,jdbcType=BIGINT}, #{token,jdbcType=VARCHAR})
+      #{userId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{userGroup,jdbcType=VARCHAR}, 
+      #{userGroupId,jdbcType=BIGINT}, #{token,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.chris.robot_server.model.TelegramUser">
     insert into telegram_user
@@ -59,6 +60,9 @@
       <if test="token != null">
         token,
       </if>
+      <if test="displayName != null">
+        display_name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -71,7 +75,7 @@
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="userId != null">
-        #{userId,jdbcType=VARCHAR},
+        #{userId,jdbcType=BIGINT},
       </if>
       <if test="userName != null">
         #{userName,jdbcType=VARCHAR},
@@ -85,6 +89,9 @@
       <if test="token != null">
         #{token,jdbcType=VARCHAR},
       </if>
+      <if test="displayName != null">
+        #{displayName,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.chris.robot_server.model.TelegramUser">
@@ -97,7 +104,7 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="userId != null">
-        user_id = #{userId,jdbcType=VARCHAR},
+        user_id = #{userId,jdbcType=BIGINT},
       </if>
       <if test="userName != null">
         user_name = #{userName,jdbcType=VARCHAR},
@@ -111,6 +118,9 @@
       <if test="token != null">
         token = #{token,jdbcType=VARCHAR},
       </if>
+      <if test="displayName != null">
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -118,11 +128,12 @@
     update telegram_user
     set create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      user_id = #{userId,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=BIGINT},
       user_name = #{userName,jdbcType=VARCHAR},
       user_group = #{userGroup,jdbcType=VARCHAR},
       user_group_id = #{userGroupId,jdbcType=BIGINT},
-      token = #{token,jdbcType=VARCHAR}
+      token = #{token,jdbcType=VARCHAR},
+      display_name = #{displayName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

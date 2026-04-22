@@ -47,6 +47,6 @@
     <!-- <table tableName="telegram_group" domainObjectName="TelegramGroup" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> -->
     <!-- <table tableName="telegram_link" domainObjectName="TelegramLink" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> -->
      <!-- <table tableName="lottery_push_expect" domainObjectName="LotteryPushExpect" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> -->
-     <table tableName="bot_keyword" domainObjectName="BotKeyword" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+     <table tableName="manager" domainObjectName="Manager" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

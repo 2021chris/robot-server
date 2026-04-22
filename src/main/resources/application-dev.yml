@@ -109,7 +109,6 @@ server:
 
 telegram:
   bot-base-url: https://lavona-systemizable-zaid.ngrok-free.dev
-  # bot-token: 8507501119:AAEnlQPcEU1OKmGvpgtuBD3IyhfFTTPGw3c
 
 push:
   daily-message: "📢 今日公告：欢迎使用民间机器人！"

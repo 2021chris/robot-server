@@ -12,7 +12,7 @@ public class TelegramUser {
 
     private Date updateTime;
 
-    private String userId;
+    private Long userId;
 
     private String userName;
 
@@ -21,5 +21,7 @@ public class TelegramUser {
     private Long userGroupId;
 
     private String token;
+
+    private String displayName;
 
 }

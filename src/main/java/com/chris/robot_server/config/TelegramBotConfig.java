@@ -46,6 +46,17 @@ public class TelegramBotConfig {
         return botMap;
     }
 
+    @Bean
+    public Map<String, Long> botIdMap() {
+        Map<String, Long> botIdMap = new ConcurrentHashMap<>();
+        
+        // 从数据库加载所有机器人
+        List<TelegramBots> enabledBots = telegramBotsMapper.selectAllBots();
+        
+        enabledBots.forEach(bot -> botIdMap.put(bot.getToken(), bot.getBotId()));
+        return botIdMap;
+    }
+
     private void setWebhook(TelegramBot bot, String token) {
         String webhookUrl = baseUrl + "/webhook/" + token;
 

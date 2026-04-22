@@ -12,9 +12,10 @@
     <result column="last_message_id" jdbcType="INTEGER" property="lastMessageId" />
     <result column="token" jdbcType="VARCHAR" property="token" />
     <result column="bot_id" jdbcType="BIGINT" property="botId" />
+    <result column="settings" jdbcType="VARCHAR" property="settings" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, group_id, title, type, create_time, update_time, status, last_message_id, token, bot_id
+    id, group_id, title, type, create_time, update_time, status, last_message_id, token, bot_id, settings
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -28,7 +29,9 @@
   <select id="findByStatus" resultMap="BaseResultMap">
     SELECT * FROM telegram_group WHERE status = #{status}
   </select>
-  
+  <select id="findByGroupIdAndToken" parameterType="map" resultMap="BaseResultMap">
+    SELECT * FROM telegram_group WHERE group_id = #{groupId} AND token = #{token}
+  </select>
   <select id="selectAllGroups" resultMap="BaseResultMap">
     SELECT * FROM telegram_group
   </select>
@@ -42,10 +45,10 @@
   </delete>
   <insert id="insert" parameterType="com.chris.robot_server.model.TelegramGroup">
     insert into telegram_group (id, group_id, title, 
-      type, create_time, update_time, token
+      type, create_time, update_time, token, settings
       )
     values (#{id,jdbcType=BIGINT}, #{groupId,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, 
-      #{type,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{token,jdbcType=VARCHAR}
+      #{type,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{token,jdbcType=VARCHAR}, #{settings,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.chris.robot_server.model.TelegramGroup">
@@ -78,6 +81,9 @@
       <if test="botId != null">
         bot_id,
       </if>
+      <if test="settings != null">
+        settings,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -106,6 +112,9 @@
       </if>
       <if test="botId != null">
         #{botId,jdbcType=BIGINT},
+      </if>
+      <if test="settings != null">
+        #{settings,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -144,6 +153,9 @@
       <if test="botId != null">
         bot_id = #{botId,jdbcType=BIGINT},
       </if>
+      <if test="settings != null">
+        settings = #{settings,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -156,7 +168,8 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       status = #{status,jdbcType=TINYINT},
       token = #{token,jdbcType=VARCHAR},
-      bot_id = #{botId,jdbcType=BIGINT}
+      bot_id = #{botId,jdbcType=BIGINT},
+      settings = #{settings,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>
