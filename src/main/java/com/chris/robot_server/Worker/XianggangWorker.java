@@ -109,7 +109,7 @@ public class XianggangWorker extends BaseLotteryWorker<LotteryHistoryXg> {
                 last.setWave(wave);
                 mapper.updateByPrimaryKeySelective(last);
             }
-            notifyGroups(record);
+            // notifyGroups(record);
 
         } catch (IOException e) {
             sleepRandom(5000, 9000);

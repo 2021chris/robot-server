@@ -124,8 +124,25 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
         }
     }
 
+    private boolean isEnabledBack(String settings) {
+        if (settings == null) {
+            return false;
+        }
+        String[] parts = settings.split("\\|");
+        if (parts.length < 2) {
+            return false;
+        }
+        return "1".equals(parts[1]);
+    }
+
     private void notifyGroups(LotteryHistory r) {
-        List<TelegramGroup> groups = groupMapper.findByStatus(OpenStatusEnum.Xin_Aomen.getCode());
+        // List<TelegramGroup> groups = groupMapper.findByStatus(OpenStatusEnum.Xin_Aomen.getCode());
+
+        List<TelegramGroup> groups = groupMapper.selectAllGroups();
+        if (groups == null || groups.isEmpty()) {
+            return;
+        }
+
         int batchSize = 10;
         LotteryHistoryVO vo = new LotteryHistoryVO();
         vo.setExpect(r.getExpect());
@@ -135,6 +152,14 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
         for (int i = 0; i < groups.size(); i += batchSize) {
             int end = Math.min(i + batchSize, groups.size());
             for (TelegramGroup g : groups.subList(i, end)) {
+                String settings = g.getSettings();
+                if(settings == null) {
+                    continue;
+                }
+                boolean xaEnabled = isEnabledBack(settings);
+                if (!xaEnabled) {
+                    continue; // 该群未启用新澳门推送，跳过
+                }
                 pushService.pushToGroups(vo, g);
             }
             try {

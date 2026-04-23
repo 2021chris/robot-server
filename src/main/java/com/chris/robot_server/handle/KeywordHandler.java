@@ -52,7 +52,6 @@ public class KeywordHandler implements BaseHandler {
     @Qualifier("redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
-
     @Override
     public boolean supports(Update update) {
         return update.message() != null && update.message().text() != null;
@@ -71,6 +70,12 @@ public class KeywordHandler implements BaseHandler {
             bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
         }
         if ("设置".equals(text)) {
+            Long userId = update.message().from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
             sendSetting(bot, chatId, token);
         }
         // 非菜单关键词
@@ -89,7 +94,8 @@ public class KeywordHandler implements BaseHandler {
         }
     }
 
-   
+    
+
     private String getCaptionTelegramLinks(String type) {
         List<TelegramLink> telegramLinks = telegramLinkMapper.selectByType(type);
         StringBuilder sb = new StringBuilder();
@@ -194,13 +200,13 @@ public class KeywordHandler implements BaseHandler {
     private void sendSetting(TelegramBot bot, long chatId, String token) {
         TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
         System.out.println("当前群设置: " + telegramGroup);
-        if(telegramGroup == null) {
+        if (telegramGroup == null) {
             bot.execute(new SendMessage(chatId, "需要在群/频道中设置"));
             return;
         }
         // TODO 只能管理员设置
         String settings = telegramGroup.getSettings();
-        if(settings == null) {
+        if (settings == null) {
             settings = "1_0_0_0|0";// 快乐8_香港_新澳门_澳门|新澳实时开奖
         }
         String[] parts = settings.split("\\|");
@@ -221,19 +227,20 @@ public class KeywordHandler implements BaseHandler {
                         new InlineKeyboardButton(aomen == 1 ? "✅澳门六合彩" : "❌澳门六合彩").callbackData("open-aomen"),
                 },
                 new InlineKeyboardButton[] {
-                        new InlineKeyboardButton(shishiXinaomen == 1 ? "✅新澳六合彩实时开奖" : "❌新澳六合彩实时开奖").callbackData("open-shishi-xinaomen"),
+                        new InlineKeyboardButton(shishiXinaomen == 1 ? "✅新澳六合彩实时开奖" : "❌新澳六合彩实时开奖")
+                                .callbackData("open-shishi-xinaomen"),
                 });
-        
+
         SendResponse resp = bot.execute(new SendMessage(chatId, "选择开奖订阅功能：").replyMarkup(keyboard));
         if (resp.isOk()) {
             String botGroupKey = sysConfig.BOT_GROUP_DAHHANG_KEY + chatId;
             redisTemplate.opsForValue().set(botGroupKey, resp.message().messageId().toString());
         }
-       
+
     }
 
     @Override
-    public int priority() { 
+    public int priority() {
         return 20;
     }
 }

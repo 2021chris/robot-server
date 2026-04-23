@@ -77,7 +77,7 @@ public class BotManagementServiceImpl implements BotManagementService {
 
         SetWebhook setWebhook = new SetWebhook()
                 .url(webhookUrl)
-                .allowedUpdates("message", "callback_query", "inline_query", "my_chat_member")
+                .allowedUpdates("message", "callback_query", "inline_query", "my_chat_member", "channel_post")
                 .maxConnections(100)
                 .dropPendingUpdates(true);
 

@@ -3,8 +3,16 @@ package com.chris.robot_server.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Chat.Type;
+import com.pengrad.telegrambot.model.ChatMember;
+import com.pengrad.telegrambot.model.ChatMember.Status;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
+import com.pengrad.telegrambot.request.GetChatMember;
+import com.pengrad.telegrambot.response.GetChatMemberResponse;
 
 public class TelegramTextUtil {
     public static String normalize(String text) {
@@ -106,5 +114,40 @@ public class TelegramTextUtil {
         }
         // newChatMembers 情况可类似处理
         return null;
+    }
+
+
+    public static boolean isAdmin(TelegramBot bot, Long chatId, Long userId) {
+
+        GetChatMember request = new GetChatMember(chatId, userId);
+        GetChatMemberResponse response = bot.execute(request);
+
+        if (!response.isOk()) {
+            return false;
+        }
+
+        ChatMember member = response.chatMember();
+
+        if (member == null)
+            return false;
+
+        Status status = member.status();
+
+        return status == ChatMember.Status.administrator || status == ChatMember.Status.creator;
+    }
+
+    public static Message getMessage(Update update) {
+        if (update.message() != null) return update.message();
+        if (update.channelPost() != null) return update.channelPost();
+        return null;
+    }
+
+    public static Type getChatType(Update update) {
+        Message msg = getMessage(update);
+        if (msg == null || msg.chat() == null) {
+            return null;
+        }
+        Chat.Type type = msg.chat().type();
+        return type != null ? type : null;
     }
 }

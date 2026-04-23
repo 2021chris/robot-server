@@ -24,6 +24,7 @@ import com.chris.robot_server.model.LotteryHistoryXg;
 import com.chris.robot_server.model.TelegramGroup;
 import com.chris.robot_server.model.TelegramLink;
 import com.chris.robot_server.service.ImageGeneratorService;
+import com.chris.robot_server.util.TelegramTextUtil;
 import com.chris.robot_server.vo.LotteryRow;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -81,8 +82,16 @@ public class CallbackHandler implements BaseHandler {
             String caption = getCaptionTelegramLinks("tm");
             bot.execute(new SendMessage(chatId, caption).parseMode(ParseMode.HTML));
         }
-        // 快乐8_香港_新澳门_澳门|新澳实时开奖
+        //============设置快乐8_香港_新澳门_澳门|新澳实时开奖
         else if("open-kl8".equals(data)) {
+
+            Long userId = query.from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
+
             TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
             boolean kl8Enabled = isEnabledFront(telegramGroup.getSettings(), 0);
             String updatedSettings = updateSettingsFront(telegramGroup.getSettings(), 0, !kl8Enabled);
@@ -92,6 +101,12 @@ public class CallbackHandler implements BaseHandler {
             // handleGroupStatus(bot,chatId, OpenStatusEnum.KL8.getCode(), token);
         }
         else if("open-hongkong".equals(data)) {
+            Long userId = query.from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
             TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
             boolean xgEnabled = isEnabledFront(telegramGroup.getSettings(), 1);
             String updatedSettings = updateSettingsFront(telegramGroup.getSettings(), 1, !xgEnabled);
@@ -100,6 +115,12 @@ public class CallbackHandler implements BaseHandler {
             sendDaoHangMenu(updatedSettings, bot, chatId);
         }
         else if("open-xin-aomen".equals(data)) {
+            Long userId = query.from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
             TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
             boolean xinaomenEnabled = isEnabledFront(telegramGroup.getSettings(), 2);
             String updatedSettings = updateSettingsFront(telegramGroup.getSettings(), 2, !xinaomenEnabled);
@@ -108,6 +129,12 @@ public class CallbackHandler implements BaseHandler {
             sendDaoHangMenu(updatedSettings, bot, chatId);
         }
         else if("open-aomen".equals(data)) {
+            Long userId = query.from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
             TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
             boolean aomenEnabled = isEnabledFront(telegramGroup.getSettings(), 3);
             String updatedSettings = updateSettingsFront(telegramGroup.getSettings(), 3, !aomenEnabled);
@@ -116,6 +143,12 @@ public class CallbackHandler implements BaseHandler {
             sendDaoHangMenu(updatedSettings, bot, chatId);
         }
         else if("open-shishi-xinaomen".equals(data)) {
+            Long userId = query.from().id();
+            boolean isAdmin = TelegramTextUtil.isAdmin(bot, chatId, userId);
+            if (!isAdmin) {
+                bot.execute(new SendMessage(chatId, "只有管理员可以设置"));
+                return;
+            }
             TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
             boolean shishiXinaomenEnabled = isEnabledBack(telegramGroup.getSettings());
             String updatedSettings = updateSettingBack(telegramGroup.getSettings(), !shishiXinaomenEnabled);

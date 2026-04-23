@@ -40,7 +40,7 @@ public class TelegramBotConfig {
             botMap.put(entity.getToken(), bot);
 
             // @TODO启动时重新设置 Webhook（安全可靠）
-            // setWebhook(bot, entity.getToken());
+            setWebhook(bot, entity.getToken());
         }
 
         return botMap;
@@ -62,7 +62,7 @@ public class TelegramBotConfig {
 
         SetWebhook setWebhook = new SetWebhook()
                 .url(webhookUrl)
-                .allowedUpdates("message", "callback_query", "inline_query", "my_chat_member")
+                .allowedUpdates("message", "callback_query", "inline_query", "my_chat_member", "channel_post")
                 .maxConnections(100)
                 .dropPendingUpdates(true); // 推荐：启动时清空旧的待处理消息
 

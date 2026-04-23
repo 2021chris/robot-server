@@ -124,7 +124,7 @@ public class Kl8Worker extends BaseLotteryWorker<LotteryHistoryKl> {
                 mapper.updateByPrimaryKeySelective(last);
             }
 
-            notifyGroups(record);
+            // notifyGroups(record);
         } catch (IOException e) {
             sleepRandom(5000, 9000);
         }

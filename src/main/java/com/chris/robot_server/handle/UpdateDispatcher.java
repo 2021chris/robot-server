@@ -34,7 +34,7 @@ public class UpdateDispatcher {
 
     // 你原来的业务服务、命令处理器等全部注入这里
     public void handle(TelegramBot bot, String token, Update update) {
-        // 只有真正有用户参与的 Update 才采集
+        // 采集用户
         if (shouldCollectUser(update)) {
             Long botId = botIdMap.get(token); // 从映射中获取 botId
             userCollectService.collectUser(update,botId, token);   // token 作为 botId
