@@ -136,8 +136,6 @@ public class XinaoWorker extends BaseLotteryWorker<LotteryHistory> {
     }
 
     private void notifyGroups(LotteryHistory r) {
-        // List<TelegramGroup> groups = groupMapper.findByStatus(OpenStatusEnum.Xin_Aomen.getCode());
-
         List<TelegramGroup> groups = groupMapper.selectAllGroups();
         if (groups == null || groups.isEmpty()) {
             return;

@@ -1,10 +1,7 @@
 package com.chris.robot_server.handle;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,18 +9,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 
 import com.chris.robot_server.config.sysConfig;
-import com.chris.robot_server.dao.LotteryHistoryMapper;
 import com.chris.robot_server.dao.TelegramGroupMapper;
 import com.chris.robot_server.dao.TelegramLinkMapper;
 import com.chris.robot_server.enums.KeywordTypeEnum;
 import com.chris.robot_server.model.BotKeyword;
-import com.chris.robot_server.model.LotteryHistory;
 import com.chris.robot_server.model.TelegramGroup;
 import com.chris.robot_server.model.TelegramLink;
 import com.chris.robot_server.service.BotKeywordService;
-import com.chris.robot_server.service.ImageGeneratorService;
+import com.chris.robot_server.service.PushService;
 import com.chris.robot_server.util.TelegramTextUtil;
-import com.chris.robot_server.vo.LotteryRow;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -44,10 +38,9 @@ import lombok.RequiredArgsConstructor;
 public class KeywordHandler implements BaseHandler {
 
     private final TelegramLinkMapper telegramLinkMapper;
-    private final ImageGeneratorService imageGeneratorService;
-    private final LotteryHistoryMapper lotteryHistoryMapper;
     private final BotKeywordService botKeywordService;
     private final TelegramGroupMapper telegramGroupMapper;
+    private final PushService pushService;
     @Autowired
     @Qualifier("redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
@@ -63,7 +56,7 @@ public class KeywordHandler implements BaseHandler {
         long chatId = update.message().chat().id();// 群id
 
         if ("历史".equals(text) || "开奖".equals(text) || "k".equals(text)) {
-            handleLotteryImage(bot, chatId);
+            sendHistory(bot, chatId, token);
         }
         if ("挑码".equals(text) || "挑码助手".equals(text) || "t".equals(text) || "挑".equals(text)) {
             String caption = getCaptionTelegramLinks("tm");
@@ -118,35 +111,39 @@ public class KeywordHandler implements BaseHandler {
         return HtmlUtils.htmlEscape(text);
     }
 
-    private void handleLotteryImage(TelegramBot bot, Long chatId) {
-        List<LotteryHistory> list = lotteryHistoryMapper.selectLatestList(15);
-        if (CollectionUtils.isEmpty(list)) {
-            bot.execute(new SendMessage(chatId, "暂无数据"));
+    // 根据群setting配置发送历史记录
+    private void sendHistory(TelegramBot bot, Long chatId, String token) {
+        TelegramGroup telegramGroup = telegramGroupMapper.findByGroupIdAndToken(chatId, token);
+        if (telegramGroup == null) {
             return;
         }
-        LotteryHistory first = list.get(0);
-        // String fileId = first.getFileId();
-        // if (fileId != null) {
-        // sendByFileId(chatId, fileId, "新澳门六合彩");
-        // return;
-        // } else {
-        List<LotteryRow> rows = list.stream().map(item -> new LotteryRow(item.getExpect(), item.getOpenCode()))
-                .collect(Collectors.toList());
-        try {
-            byte[] imageBytes = imageGeneratorService.generateLotteryImage(rows);
-            // 3️⃣ 上传图片 → 获取 file_id
-            String newFileId = sendAndGetFileId(bot, chatId, imageBytes, "新澳门六合彩");
-            if (newFileId != null) {
-                // 4️⃣ 保存 file_id 到数据库
-                first.setFileId(newFileId);
-                lotteryHistoryMapper.updateByPrimaryKeySelective(first);
-            }
-        } catch (IOException e) {
-            bot.execute(new SendMessage(chatId, "数据获取失败"));
-            e.printStackTrace();
+        String settings = telegramGroup.getSettings();
+        if (settings == null) {
+            settings = "1_0_0_0|0";// 快乐8_香港_新澳门_澳门|新澳实时开奖
         }
-        // }
+        String[] parts = settings.split("\\|");
+        String[] frontParts = parts[0].split("_");
+        int kl8 = Integer.parseInt(frontParts[0]);
+        int hongkong = Integer.parseInt(frontParts[1]);
+        int xinAomen = Integer.parseInt(frontParts[2]);
+        int aomen = Integer.parseInt(frontParts[3]);
+
+        if (kl8 == 1) {
+            pushService.handleLotteryKlImage(bot, chatId);
+        }
+        if (hongkong == 1) {
+            pushService.handleLotteryXgImage(bot, chatId);
+        }
+        if (xinAomen == 1) {
+            pushService.handleLotteryImage(bot, chatId);
+        }
+        if (aomen == 1) {
+            pushService.handleLotterylaoImage(bot, chatId);
+        }
     }
+
+
+    
 
     /**
      * 发送图片字节数组到指定聊天ID并获取文件ID

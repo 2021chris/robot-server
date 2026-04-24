@@ -58,6 +58,7 @@ public class BotManagementServiceImpl implements BotManagementService {
         newBot.setBotname(botUser.username() != null ? botUser.username() : "unknown");
         newBot.setBotId(botUser.id());
         newBot.setStatus((byte)1);
+        newBot.setGroupNumber(0);
         telegramBotsMapper.insert(newBot); // 插入数据库，生成 ID
 
         TelegramBot bot = new TelegramBot(token);

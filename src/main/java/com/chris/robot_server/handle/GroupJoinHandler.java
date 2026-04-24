@@ -1,9 +1,8 @@
 package com.chris.robot_server.handle;
 
-import org.checkerframework.checker.units.qual.s;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.chris.robot_server.dao.TelegramBotsMapper;
 import com.chris.robot_server.dao.TelegramGroupMapper;
 import com.chris.robot_server.model.TelegramGroup;
 import com.pengrad.telegrambot.model.Update;
@@ -24,6 +23,7 @@ import com.pengrad.telegrambot.model.ChatMemberUpdated;
 public class GroupJoinHandler implements BaseHandler {
 
     private final TelegramGroupMapper telegramGroupMapper;
+    private final TelegramBotsMapper telegramBotsMapper;
 
 
     @Override
@@ -56,11 +56,13 @@ public class GroupJoinHandler implements BaseHandler {
         if (joined) {
             System.out.println("JOIN DETECTED: " + title);
             saveGroup(groupId, title, type, currentBotId, token);
+            telegramBotsMapper.addGroupNumberByBotId(currentBotId);
         }
 
         if (left) {
             System.out.println("BOT REMOVED: " + title);
             deleteGroup(groupId, token);
+            telegramBotsMapper.subtractGroupNumberByBotId(currentBotId);
         }
     }
 

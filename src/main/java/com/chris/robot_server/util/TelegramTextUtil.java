@@ -3,6 +3,8 @@ package com.chris.robot_server.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.util.HtmlUtils;
+
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Chat.Type;
@@ -149,5 +151,10 @@ public class TelegramTextUtil {
         }
         Chat.Type type = msg.chat().type();
         return type != null ? type : null;
+    }
+
+
+    public static String escape(String text) {
+        return HtmlUtils.htmlEscape(text);
     }
 }

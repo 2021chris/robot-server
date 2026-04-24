@@ -46,6 +46,21 @@ spring:
     servlet:
       load-on-startup: 1
 
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: QAZokm0987@
+    timeout: 13000ms
+    lettuce:
+      pool:
+        min-idle: 10
+        max-idle: 50
+        max-active: 200
+        max-wait: 10000ms
+
+  cache:
+    type: redis
+
 mybatis:
   type-aliases-package: com.chris.robot_server.model
   mapper-locations: classpath:/mybatis-mappers/*
@@ -92,7 +107,7 @@ server:
 
 
 telegram:
-  bot-token: 8507501119:AAEnlQPcEU1OKmGvpgtuBD3IyhfFTTPGw3c
+  bot-base-url: www.palshort.net
 
 push:
   daily-message: "📢 今日公告：欢迎使用民间机器人！"

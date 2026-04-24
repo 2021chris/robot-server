@@ -22,4 +22,6 @@ public class TelegramBots {
 
     private Long botId;
 
+    private Integer groupNumber;
+
 }

@@ -10,9 +10,10 @@
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="bot_id" jdbcType="BIGINT" property="botId" />
+    <result column="group_number" jdbcType="INTEGER" property="groupNumber" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, create_time, update_time, token, botname, description, status, bot_id
+    id, create_time, update_time, token, botname, description, status, bot_id, group_number
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -38,10 +39,10 @@
   <insert id="insert" parameterType="com.chris.robot_server.model.TelegramBots">
     insert into telegram_bots (id, create_time, update_time, 
       token, botname, description, 
-      status, bot_id)
+      status, bot_id, group_number)
     values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{token,jdbcType=VARCHAR}, #{botname,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
-      #{status,jdbcType=TINYINT}, #{botId,jdbcType=BIGINT})
+      #{status,jdbcType=TINYINT}, #{botId,jdbcType=BIGINT}, #{groupNumber,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.chris.robot_server.model.TelegramBots">
     insert into telegram_bots
@@ -70,6 +71,9 @@
       <if test="botId != null">
         bot_id,
       </if>
+      <if test="groupNumber != null">
+        group_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -96,8 +100,31 @@
       <if test="botId != null">
         #{botId,jdbcType=BIGINT},
       </if>
+      <if test="groupNumber != null">
+        #{groupNumber,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
+  <update id="addGroupNumber" parameterType="java.lang.Long">
+    update telegram_bots
+    set group_number = group_number + 1
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="subtractGroupNumber" parameterType="java.lang.Long">
+    update telegram_bots
+    set group_number = GREATEST(group_number - 1, 0)
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="addGroupNumberByBotId" parameterType="java.lang.Long">
+    update telegram_bots
+    set group_number = group_number + 1
+    where bot_id = #{botId,jdbcType=BIGINT}
+  </update>
+  <update id="subtractGroupNumberByBotId" parameterType="java.lang.Long">
+    update telegram_bots
+    set group_number = GREATEST(group_number - 1, 0)
+    where bot_id = #{botId,jdbcType=BIGINT}
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.chris.robot_server.model.TelegramBots">
     update telegram_bots
     <set>
@@ -122,6 +149,9 @@
       <if test="botId != null">
         bot_id = #{botId,jdbcType=BIGINT},
       </if>
+      <if test="groupNumber != null">
+        group_number = #{groupNumber,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -133,7 +163,8 @@
       botname = #{botname,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       status = #{status,jdbcType=TINYINT},
-      bot_id = #{botId,jdbcType=BIGINT}
+      bot_id = #{botId,jdbcType=BIGINT},
+      group_number = #{groupNumber,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

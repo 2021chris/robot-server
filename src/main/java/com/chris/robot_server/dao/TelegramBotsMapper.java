@@ -23,4 +23,13 @@ public interface TelegramBotsMapper {
     List<TelegramBots> selectAllBots();
 
     TelegramBots findByToken(String token);
+
+
+    int addGroupNumber(Long id);
+
+    int subtractGroupNumber(Long id);
+
+    int addGroupNumberByBotId(Long botId);
+
+    int subtractGroupNumberByBotId(Long botId);
 }

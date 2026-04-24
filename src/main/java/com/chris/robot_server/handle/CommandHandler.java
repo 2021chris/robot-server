@@ -38,6 +38,9 @@ public class CommandHandler implements BaseHandler {
                         case "/menu":
                                 sendMenu(bot, chatId);
                                 break;
+                        case "/start":
+                                bot.execute(new SendMessage(chatId, "欢迎使用六合彩官方机器人！"));
+                                break;
                         default:
                                 bot.execute(new SendMessage(chatId, "未知命令"));
                 }
