@@ -33,6 +33,39 @@
       #{userId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{userGroup,jdbcType=VARCHAR}, 
       #{userGroupId,jdbcType=BIGINT}, #{token,jdbcType=VARCHAR}, #{displayName,jdbcType=VARCHAR})
   </insert>
+  <insert id="insertOrUpdate" parameterType="com.chris.robot_server.model.TelegramUser">
+    insert into telegram_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="id != null">id,</if>
+        <if test="createTime != null">create_time,</if>
+        <if test="updateTime != null">update_time,</if>
+        <if test="userId != null">user_id,</if>
+        <if test="userName != null">user_name,</if>
+        <if test="userGroup != null">user_group,</if>
+        <if test="userGroupId != null">user_group_id,</if>
+        <if test="token != null">token,</if>
+        <if test="displayName != null">display_name,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="id != null">#{id,jdbcType=BIGINT},</if>
+        <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+        <if test="userId != null">#{userId,jdbcType=BIGINT},</if>
+        <if test="userName != null">#{userName,jdbcType=VARCHAR},</if>
+        <if test="userGroup != null">#{userGroup,jdbcType=VARCHAR},</if>
+        <if test="userGroupId != null">#{userGroupId,jdbcType=BIGINT},</if>
+        <if test="token != null">#{token,jdbcType=VARCHAR},</if>
+        <if test="displayName != null">#{displayName,jdbcType=VARCHAR},</if>
+    </trim>
+      on duplicate key update
+          create_time = ifnull(values(create_time), create_time),
+          update_time = ifnull(values(update_time), update_time),
+          user_name = ifnull(values(user_name), user_name),
+          user_group = ifnull(values(user_group), user_group),
+          user_group_id = ifnull(values(user_group_id), user_group_id),
+          token = ifnull(values(token), token),
+          display_name = ifnull(values(display_name), display_name)
+  </insert>
   <insert id="insertSelective" parameterType="com.chris.robot_server.model.TelegramUser">
     insert into telegram_user
     <trim prefix="(" suffix=")" suffixOverrides=",">

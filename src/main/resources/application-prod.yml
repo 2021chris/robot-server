@@ -107,7 +107,7 @@ server:
 
 
 telegram:
-  bot-base-url: www.palshort.net
+  bot-base-url: https://www.palshort.net
 
 push:
   daily-message: "📢 今日公告：欢迎使用民间机器人！"

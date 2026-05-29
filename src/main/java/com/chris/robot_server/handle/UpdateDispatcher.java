@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 import com.chris.robot_server.service.UserCollectService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetMe;
-import com.pengrad.telegrambot.response.BaseResponse;
-import com.pengrad.telegrambot.response.GetMeResponse;
 
 import lombok.RequiredArgsConstructor;
 

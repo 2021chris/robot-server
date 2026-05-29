@@ -56,6 +56,7 @@ public class DrawServiceImpl implements DrawService {
         }
         return "1".equals(frontParts[index]);
     }
+    
 
     @Override
     @Transactional
@@ -135,7 +136,7 @@ public class DrawServiceImpl implements DrawService {
                 }
             }
 
-            // 新澳不发
+            // 新澳
             if ("xa".equals(pushExpect.getType())) {
                 LotteryHistory last = lotteryHistoryMapper.selectLatest();
                 if (!pushExpect.getExpect().equals(last.getExpect())) {
