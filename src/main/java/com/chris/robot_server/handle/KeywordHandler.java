@@ -117,29 +117,31 @@ public class KeywordHandler implements BaseHandler {
         if (telegramGroup == null) {
             return;
         }
-        String settings = telegramGroup.getSettings();
-        if (settings == null) {
-            settings = "1_0_0_0|0";// 快乐8_香港_新澳门_澳门|新澳实时开奖
-        }
-        String[] parts = settings.split("\\|");
-        String[] frontParts = parts[0].split("_");
-        int kl8 = Integer.parseInt(frontParts[0]);
-        int hongkong = Integer.parseInt(frontParts[1]);
-        int xinAomen = Integer.parseInt(frontParts[2]);
-        int aomen = Integer.parseInt(frontParts[3]);
+        // String settings = telegramGroup.getSettings();
+        // if (settings == null) {
+        //     settings = "1_0_0_0|0";// 快乐8_香港_新澳门_澳门|新澳实时开奖
+        // }
+        // String[] parts = settings.split("\\|");
+        // String[] frontParts = parts[0].split("_");
+        // int kl8 = Integer.parseInt(frontParts[0]);
+        // int hongkong = Integer.parseInt(frontParts[1]);
+        // int xinAomen = Integer.parseInt(frontParts[2]);
+        // int aomen = Integer.parseInt(frontParts[3]);
 
-        if (kl8 == 1) {
-            pushService.handleLotteryKlImage(bot, chatId);
-        }
-        if (hongkong == 1) {
-            pushService.handleLotteryXgImage(bot, chatId);
-        }
-        if (xinAomen == 1) {
-            pushService.handleLotteryImage(bot, chatId);
-        }
-        if (aomen == 1) {
-            pushService.handleLotterylaoImage(bot, chatId);
-        }
+        // if (kl8 == 1) {
+        //     pushService.handleLotteryKlImage(bot, chatId);
+        // }
+        // if (hongkong == 1) {
+        //     pushService.handleLotteryXgImage(bot, chatId);
+        // }
+        // if (xinAomen == 1) {
+        //     pushService.handleLotteryImage(bot, chatId);
+        // }
+        // if (aomen == 1) {
+        //     pushService.handleLotterylaoImage(bot, chatId);
+        // }
+
+        pushService.handleLotteryImage(bot, chatId);
     }
 
 
